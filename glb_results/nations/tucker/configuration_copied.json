@@ -1,0 +1,37 @@
+{   
+    "metadata": {
+        "title": "tucker nations"
+    },
+    "pipeline": {
+        "dataset": "nations",
+        "dataset_kwargs": {
+            "create_inverse_triples": true
+        },
+        "evaluator": "rankbased",
+        "evaluator_kwargs": {
+            "filtered": true
+        },
+        "loss": "softplus",
+        "model": "tucker",
+        "model_kwargs": {
+            "embedding_dim": 64,
+            "relation_dim": 64,
+            "dropout_0": 0.48662787765630866,
+            "dropout_1": 0.28808916125753253,
+            "dropout_2": 0.14643187227813925,
+            "apply_batch_normalization": true
+        },
+        "optimizer": "adam",
+        "optimizer_kwargs": {
+            "lr": 0.0015610329825690296,
+            "weight_decay": 0.0
+        },
+        "regularizer": "no",
+        "training_loop": "lcwa",
+        "training_kwargs": {
+            "batch_size": 128,
+            "num_epochs": 351,
+            "label_smoothing": 0.0022863392922473228
+        }
+    }
+}
