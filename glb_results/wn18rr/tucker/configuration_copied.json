@@ -1,0 +1,38 @@
+{   
+    "metadata": {
+        "title": "tucker wn18rr"
+    },
+    "pipeline": {
+        "dataset": "wn18rr",
+        "dataset_kwargs": {
+            "create_inverse_triples": true
+        },
+        "evaluator": "rankbased",
+        "evaluator_kwargs": {
+            "filtered": true,
+            "batch_size": 32
+        },
+        "loss": "crossentropy",
+        "model": "tucker",
+        "model_kwargs": {
+            "embedding_dim": 64,
+            "relation_dim": 128,
+            "dropout_0": 0.4482944548454483,
+            "dropout_1": 0.4358766437293924,
+            "dropout_2": 0.17205788384518664,
+            "apply_batch_normalization": true
+        },
+        "optimizer": "adam",
+        "optimizer_kwargs": {
+            "lr": 0.019495747047464235,
+            "weight_decay": 0.0
+        },
+        "regularizer": "no",
+        "training_loop": "lcwa",
+        "training_kwargs": {
+            "batch_size": 128,
+            "num_epochs": 301,
+            "label_smoothing": 0.0014355813466683364
+        }
+    }
+}
