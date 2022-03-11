@@ -52,9 +52,15 @@ def collate():
     df = pd.DataFrame(rows).sort_values(by=["dataset", "model"])
     df.to_csv(COLLATED_PATH, sep="\t", index=False)
 
-    id_vars = ["dataset", "dataset_triples", "model", "evaluation", "training"]
+    id_vars = ["dataset", "dataset_triples", "model"]
     melted_df = pd.melt(
-        df, id_vars=id_vars, value_vars=[v for v in df.columns if v not in id_vars]
+        df,
+        id_vars=id_vars,
+        value_vars=[
+            v
+            for v in df.columns
+            if v not in id_vars and v not in ("evaluation", "training")
+        ],
     ).sort_values(by=["dataset", "model", "variable"])
     melted_df.to_csv(MELTED_PATH, sep="\t", index=False)
 
