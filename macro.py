@@ -51,9 +51,7 @@ def _iter_counts(
         for split, factory in dataset.factory_dict.items():
 
             # convert to pandas dataframe
-            df = pandas.DataFrame(
-                factory.mapped_triples.numpy(), columns=["h", "r", "t"]
-            )
+            df = pandas.DataFrame(factory.mapped_triples.numpy(), columns=["h", "r", "t"])
 
             # for each side prediction
             for target in "ht":
@@ -75,9 +73,7 @@ def _save(df: pandas.DataFrame, output_directory: Path, *keys: str):
     logging.debug(f"Written to {path}")
 
 
-directory_option = click.option(
-    "--directory", type=Path, default=DEFAULT_CACHE_DIRECTORY
-)
+directory_option = click.option("--directory", type=Path, default=DEFAULT_CACHE_DIRECTORY)
 
 
 @click.group()
@@ -104,17 +100,13 @@ def collect(
     summary = []
 
     # iterate over all datasets
-    with logging_redirect_tqdm(), tqdm(
-        _iter_counts(max_triples=max_triples)
-    ) as progress:
+    with logging_redirect_tqdm(), tqdm(_iter_counts(max_triples=max_triples)) as progress:
         for dataset_name, split, target, num_triples, counts in progress:
             progress.set_postfix(datase=dataset_name, split=split, target=target)
 
             # append basic statistics to summary data(-frame)
             description = counts.describe()
-            summary.append(
-                (dataset_name, split, target, num_triples, *description.tolist())
-            )
+            summary.append((dataset_name, split, target, num_triples, *description.tolist()))
 
             # store distribution
             df = pandas.DataFrame(data=dict(counts=counts))
@@ -177,9 +169,7 @@ def plot(
     logging.info("Calculating CDFs")
     data = []
     for ds, target in tqdm_product(dataset, "ht"):
-        df = pandas.read_csv(
-            directory.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
-        )
+        df = pandas.read_csv(directory.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t")
         cs = df["counts"].sort_values(ascending=False)
         cs = cs.cumsum()
         cdf = cs / cs.iloc[-1]
@@ -214,16 +204,14 @@ def plot(
         for (dataset, side), sdf in df.groupby(["dataset", "target"])
     ]
     auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
-    auc_df.to_csv(
-        COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False
-    )
+    auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False)
 
     auc_diffs = []
     for dataset, sdf in auc_df.groupby("dataset"):
         head = sdf[sdf.target == "head"].iloc[0].auc
         tail = sdf[sdf.target == "tail"].iloc[0].auc
         size = _triples(dataset_resolver.lookup(dataset))
-        auc_diffs.append((dataset,size,  head - tail))
+        auc_diffs.append((dataset, size, head - tail))
     auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "size" "diff"])
     auc_diffs_df.sort_values("diff", inplace=True)
     auc_diffs_df.to_csv(
