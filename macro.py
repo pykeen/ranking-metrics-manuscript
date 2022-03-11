@@ -11,6 +11,7 @@ import seaborn
 from docdata import get_docdata
 from matplotlib.ticker import PercentFormatter
 from pykeen.datasets import Dataset, dataset_resolver, get_dataset
+from sklearn.metrics import auc
 from tqdm.auto import tqdm
 from tqdm.contrib.itertools import product as tqdm_product
 from tqdm.contrib.logging import logging_redirect_tqdm
@@ -19,6 +20,7 @@ HERE = Path(__file__).parent.resolve()
 DEFAULT_CACHE_DIRECTORY = HERE.joinpath("macro_cache")
 CHARTS_DIRECTORY = HERE.joinpath("charts")
 CHARTS_DIRECTORY.mkdir(exist_ok=True)
+COLLATED_DIRECTORY = HERE.joinpath("collated")
 
 
 def _triples(dataset_cls: Type[Dataset]) -> int:
@@ -184,7 +186,7 @@ def plot(
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
     df["target"] = df["target"].apply({"t": "tail", "h": "head"}.__getitem__)
-    df.to_csv(HERE.joinpath("collated", "macro.tsv"), sep="\t", index=False)
+    df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}.tsv"), sep="\t", index=False)
 
     logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
@@ -204,10 +206,19 @@ def plot(
         ax.yaxis.set_major_formatter(PercentFormatter(1))
         if grid:
             ax.grid()
+
+    # Calculate area under the curve
+    auc_rows = [
+        (dataset, side, auc(sdf["x"], sdf["y"]))
+        for (dataset, side), sdf in df.groupby(["dataset", "target"])
+    ]
+    auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
+    auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False)
+
     facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
     facet_grid.set_ylabels(label="Percentage of evaluation triples")
     facet_grid.tight_layout()
-    output_stub = CHARTS_DIRECTORY.joinpath("micro_macro_plot")
+    output_stub = CHARTS_DIRECTORY.joinpath(f"macro_{split}_plot")
     path = output_stub.with_suffix(".pdf")
     facet_grid.savefig(path)
     facet_grid.savefig(output_stub.with_suffix(".svg"))
