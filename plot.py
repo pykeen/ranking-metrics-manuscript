@@ -5,10 +5,7 @@ import pandas
 import scipy.constants
 import seaborn
 
-from collate import HERE, MELTED_PATH
-
-CHARTS_DIRECTORY = HERE.joinpath("charts")
-CHARTS_DIRECTORY.mkdir(exist_ok=True)
+from utils import CHARTS_DIRECTORY, MELTED_PATH
 
 
 def main():

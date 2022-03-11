@@ -17,11 +17,7 @@ from tqdm.auto import tqdm
 from tqdm.contrib.itertools import product as tqdm_product
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-HERE = Path(__file__).parent.resolve()
-DEFAULT_CACHE_DIRECTORY = HERE.joinpath("macro_cache")
-CHARTS_DIRECTORY = HERE.joinpath("charts")
-CHARTS_DIRECTORY.mkdir(exist_ok=True)
-COLLATED_DIRECTORY = HERE.joinpath("collated")
+from utils import CHARTS_DIRECTORY, COLLATION_DIRECTORY, DEFAULT_CACHE_DIRECTORY
 
 
 def _triples(dataset_cls: Type[Dataset]) -> int:
@@ -181,7 +177,7 @@ def plot(
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
     df["target"] = df["target"].apply({"t": "tail", "h": "head"}.__getitem__)
-    df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}.tsv.gz"), sep="\t", index=False)
+    df.to_csv(COLLATION_DIRECTORY.joinpath(f"macro_{suffix}.tsv.gz"), sep="\t", index=False)
 
     logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
@@ -208,7 +204,7 @@ def plot(
         for (dataset, side), sdf in df.groupby(["dataset", "target"])
     ]
     auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
-    auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}_auc.tsv"), sep="\t", index=False)
+    auc_df.to_csv(COLLATION_DIRECTORY.joinpath(f"macro_{suffix}_auc.tsv"), sep="\t", index=False)
 
     logging.info("Calculating area under the curve")
     auc_diffs = []
@@ -220,7 +216,7 @@ def plot(
     auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "size", "diff"])
     auc_diffs_df.sort_values("diff", inplace=True)
     auc_diffs_df.to_csv(
-        COLLATED_DIRECTORY.joinpath(f"macro_{suffix}_auc_diff.tsv"),
+        COLLATION_DIRECTORY.joinpath(f"macro_{suffix}_auc_diff.tsv"),
         sep="\t",
         index=False,
     )

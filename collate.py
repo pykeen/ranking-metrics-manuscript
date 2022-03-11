@@ -1,24 +1,18 @@
 import json
-from pathlib import Path
 
 import click
 import pandas as pd
 from docdata import get_docdata
 from pykeen.datasets import dataset_resolver
 
-HERE = Path(__file__).parent.resolve()
-INPUT_DIRECTORY = HERE.joinpath("glb_results")
-OUTPUT_DIRECTORY = HERE.joinpath("collated")
-OUTPUT_DIRECTORY.mkdir(exist_ok=True, parents=True)
-COLLATED_PATH = OUTPUT_DIRECTORY.joinpath("collated.tsv")
-MELTED_PATH = OUTPUT_DIRECTORY.joinpath("melted.tsv")
+from utils import COLLATED_PATH, MELTED_PATH, MODEL_DIRECTORY
 
 
 @click.command()
 def collate():
     """Collate the data."""
     rows = []
-    for dataset_directory in INPUT_DIRECTORY.iterdir():
+    for dataset_directory in MODEL_DIRECTORY.iterdir():
         if not dataset_directory.is_dir():
             continue
 
