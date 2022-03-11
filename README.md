@@ -2,7 +2,7 @@
 
 Results for the Ranking Metrics submission @ GLB 2022
 
-![Results](results.png)
+![Results](charts/mean_reciprocal_rank_plot.svg)
 
 ## Build
 
