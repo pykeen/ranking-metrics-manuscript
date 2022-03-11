@@ -103,8 +103,7 @@ def collect(
             )
 
             # store distribution
-            unique_counts, frequency = numpy.unique(counts.values, return_counts=True)
-            df = pandas.DataFrame(data=dict(counts=unique_counts, frequency=frequency))
+            df = pandas.DataFrame(data=dict(counts=counts))
             _save(df, output_directory, dataset_name, split, target)
 
     # store summary
@@ -135,7 +134,7 @@ def collect(
     "--dataset",
     multiple=True,
     type=str,
-    default=("fb15k237", "kinships", "nations", "wn18rr"),
+    default=[],#("fb15k237", "kinships", "nations", "wn18rr"),
 )
 @click.option(
     "-s",
@@ -149,25 +148,29 @@ def plot(
     split: str,
 ):
     """Create plot."""
+    if not dataset:
+        dataset = [path.name for path in input_root.iterdir() if path.is_dir()]
     data = []
     for ds in dataset:
         for target in "ht":
             df = pandas.read_csv(
                 input_root.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
             )
-            cs = df.sort_values(by="counts")["frequency"].cumsum()
+            cs = df["counts"].sort_values(ascending=False)
+            cs = cs.cumsum()
             cdf = cs / cs.iloc[-1]
             x = numpy.linspace(0, 1, num=len(cdf) + 1)[1:]
             data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
+    kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
     grid: seaborn.FacetGrid = seaborn.relplot(
         data=df,
         x="x",
         y="y",
         hue="dataset",
-        style="target",
         kind="line",
         facet_kws=dict(xlim=[0, 1], ylim=[0, 1]),
+        **kwargs,
     )
     for ax in grid.axes.flat:
         ax.xaxis.set_major_formatter(PercentFormatter(1))
