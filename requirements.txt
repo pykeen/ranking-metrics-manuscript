@@ -1,6 +1,0 @@
-click
-docdata
-pandas
-pykeen
-numpy
-tqdm
