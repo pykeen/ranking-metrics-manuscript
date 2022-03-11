@@ -2,27 +2,35 @@
 import logging
 import pathlib
 import tempfile
-from typing import Iterable, Optional, Tuple, Type
+from typing import Collection, Iterable, Optional, Tuple, Type
 
 import click
 import numpy
 import pandas
+import seaborn
 from docdata import get_docdata
+from matplotlib.ticker import PercentFormatter
 from pykeen.datasets import Dataset, dataset_resolver, get_dataset
 from tqdm.auto import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
+DEFAULT_DIRECTORY = pathlib.Path(tempfile.gettempdir(), "pykeen-macro")
 
-def _triples(pair: Tuple[str, Type[Dataset]]) -> int:
+
+def _triples(dataset_cls: Type[Dataset]) -> int:
     """Extract the number of triples from docdata."""
-    return get_docdata(pair[1])["statistics"]["triples"]
+    return get_docdata(dataset_cls)["statistics"]["triples"]
 
 
-def _iter_counts(max_triples: Optional[int]) -> Iterable[Tuple[str, str, str, pandas.Series]]:
+def _iter_counts(
+    max_triples: Optional[int],
+) -> Iterable[Tuple[str, str, str, int, pandas.Series]]:
     """Iterate over datasets/splits/targets and the respective counts."""
-    for dataset_name, dataset_cls in sorted(dataset_resolver.lookup_dict.items(), key=_triples):
+    for dataset_name, dataset_cls in sorted(
+        dataset_resolver.lookup_dict.items(), key=lambda pair: _triples(pair[1])
+    ):
         # skip large datasets
-        if max_triples and _triples((dataset_name, dataset_cls)) > max_triples:
+        if max_triples and _triples(dataset_cls) > max_triples:
             continue
 
         # skip unavailable datasets
@@ -36,7 +44,9 @@ def _iter_counts(max_triples: Optional[int]) -> Iterable[Tuple[str, str, str, pa
         for split, factory in dataset.factory_dict.items():
 
             # convert to pandas dataframe
-            df = pandas.DataFrame(dataset.testing.mapped_triples.numpy(), columns=["h", "r", "t"])
+            df = pandas.DataFrame(
+                factory.mapped_triples.numpy(), columns=["h", "r", "t"]
+            )
 
             # for each side prediction
             for target in "ht":
@@ -48,7 +58,7 @@ def _iter_counts(max_triples: Optional[int]) -> Iterable[Tuple[str, str, str, pa
                 # count number of unique targets per key
                 counts = group.agg({target: "nunique"})[target]
 
-                yield dataset_name, split, target, counts
+                yield dataset_name, split, target, df.shape[0], counts
 
 
 def _save(df: pandas.DataFrame, output_directory: pathlib.Path, *keys: str):
@@ -59,10 +69,15 @@ def _save(df: pandas.DataFrame, output_directory: pathlib.Path, *keys: str):
     logging.debug(f"Written to {path}")
 
 
-@click.command()
+@click.group()
+def main():
+    """Run command."""
+
+
+@main.command()
 @click.option("-m", "--max-triples", type=int, default=None)
-@click.option("-o", "--output-directory", type=pathlib.Path, default=pathlib.Path(tempfile.gettempdir(), "pykeen-macro"))
-def main(
+@click.option("-o", "--output-directory", type=pathlib.Path, default=DEFAULT_DIRECTORY)
+def collect(
     max_triples: Optional[int],
     output_directory: pathlib.Path,
 ):
@@ -75,13 +90,17 @@ def main(
     summary = []
 
     # iterate over all datasets
-    with logging_redirect_tqdm(), tqdm(_iter_counts(max_triples=max_triples)) as progress:
-        for dataset_name, split, target, counts in progress:
+    with logging_redirect_tqdm(), tqdm(
+        _iter_counts(max_triples=max_triples)
+    ) as progress:
+        for dataset_name, split, target, num_triples, counts in progress:
             progress.set_postfix(datase=dataset_name, split=split, target=target)
 
             # append basic statistics to summary data(-frame)
             description = counts.describe()
-            summary.append((dataset_name, split, target, *description.tolist()))
+            summary.append(
+                (dataset_name, split, target, num_triples, *description.tolist())
+            )
 
             # store distribution
             unique_counts, frequency = numpy.unique(counts.values, return_counts=True)
@@ -89,8 +108,73 @@ def main(
             _save(df, output_directory, dataset_name, split, target)
 
     # store summary
-    df = pandas.DataFrame(data=summary, columns=["dataset", "split", "side", "count", "mean", "std", "min", "25%", "50%", "75%", "max"])
+    df = pandas.DataFrame(
+        data=summary,
+        columns=[
+            "dataset",
+            "split",
+            "side",
+            "num_triples",
+            "count",
+            "mean",
+            "std",
+            "min",
+            "25%",
+            "50%",
+            "75%",
+            "max",
+        ],
+    )
     _save(df, output_directory, "summary")
+
+
+@main.command()
+@click.option("-i", "--input-root", type=pathlib.Path, default=DEFAULT_DIRECTORY)
+@click.option(
+    "-d",
+    "--dataset",
+    multiple=True,
+    type=str,
+    default=("fb15k237", "kinships", "nations", "wn18rr"),
+)
+@click.option(
+    "-s",
+    "--split",
+    type=click.Choice(["training", "testing", "validation"]),
+    default="testing",
+)
+def plot(
+    input_root: pathlib.Path,
+    dataset: Collection[str],
+    split: str,
+):
+    """Create plot."""
+    data = []
+    for ds in dataset:
+        for target in "ht":
+            df = pandas.read_csv(
+                input_root.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
+            )
+            cs = df.sort_values(by="counts")["frequency"].cumsum()
+            cdf = cs / cs.iloc[-1]
+            x = numpy.linspace(0, 1, num=len(cdf) + 1)[1:]
+            data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
+    df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
+    grid: seaborn.FacetGrid = seaborn.relplot(
+        data=df,
+        x="x",
+        y="y",
+        hue="dataset",
+        style="target",
+        kind="line",
+        facet_kws=dict(xlim=[0, 1], ylim=[0, 1]),
+    )
+    for ax in grid.axes.flat:
+        ax.xaxis.set_major_formatter(PercentFormatter(1))
+        ax.yaxis.set_major_formatter(PercentFormatter(1))
+    grid.set_xlabels(label="Percentage of unique ranking tasks")
+    grid.set_ylabels(label="Percentage of evaluation triples")
+    grid.savefig(input_root.joinpath("plot.pdf"))
 
 
 if __name__ == "__main__":
