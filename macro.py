@@ -144,11 +144,15 @@ def collect(
     default="testing",
 )
 @click.option("-p", "--palette", type=str, default=None)
+@click.option("-g", "--grid", is_flag=True)
+@click.option("-h", "--height", type=float, default=None)
 def plot(
     input_root: pathlib.Path,
     dataset: Collection[str],
     split: str,
     palette: Optional[str],
+    grid: bool,
+    height: Optional[float],
 ):
     """Create plot."""
     # logging setup
@@ -169,10 +173,11 @@ def plot(
         x = numpy.linspace(0, 1, num=len(cdf) + 1)[1:]
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
+    df["target"] = df["target"].apply({"t": "tail", "h": "head"}.__getitem__)
 
     logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
-    grid: seaborn.FacetGrid = seaborn.relplot(
+    facet_grid: seaborn.FacetGrid = seaborn.relplot(
         data=df,
         x="x",
         y="y",
@@ -181,14 +186,18 @@ def plot(
         facet_kws=dict(xlim=[0, 1], ylim=[0, 1]),
         **kwargs,
         palette=palette,
+        height=height,
     )
-    for ax in grid.axes.flat:
+    for ax in facet_grid.axes.flat:
         ax.xaxis.set_major_formatter(PercentFormatter(1))
         ax.yaxis.set_major_formatter(PercentFormatter(1))
-    grid.set_xlabels(label="Percentage of unique ranking tasks")
-    grid.set_ylabels(label="Percentage of evaluation triples")
+        if grid:
+            ax.grid()
+    facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
+    facet_grid.set_ylabels(label="Percentage of evaluation triples")
+    facet_grid.tight_layout()
     path = input_root.joinpath("plot.pdf")
-    grid.savefig(path)
+    facet_grid.savefig(path)
     logging.info(f"Saved to {path}")
 
 
