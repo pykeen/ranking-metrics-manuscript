@@ -36,7 +36,10 @@ def collate():
 
             configuration = json.loads(configuration_path.read_text())
             results = json.loads(
-                model_directory.joinpath("replicates", "replicate-00000", "results.json").read_text())
+                model_directory.joinpath(
+                    "replicates", "replicate-00000", "results.json"
+                ).read_text()
+            )
             row = dict(
                 dataset=configuration["pipeline"]["dataset"],
                 dataset_triples=dataset_triples,
@@ -46,13 +49,15 @@ def collate():
             )
             rows.append(row)
 
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(rows).sort_values(by=["dataset", "model"])
     df.to_csv(COLLATED_PATH, sep="\t", index=False)
 
-    id_vars = ['dataset', 'dataset_triples', 'model', 'evaluation', 'training']
-    melted_df = pd.melt(df, id_vars=id_vars, value_vars=[v for v in df.columns if v not in id_vars])
+    id_vars = ["dataset", "dataset_triples", "model", "evaluation", "training"]
+    melted_df = pd.melt(
+        df, id_vars=id_vars, value_vars=[v for v in df.columns if v not in id_vars]
+    ).sort_values(by=["dataset", "model", "variable"])
     melted_df.to_csv(MELTED_PATH, sep="\t", index=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     collate()
