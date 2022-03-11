@@ -50,6 +50,9 @@ def collate():
             rows.append(row)
 
     df = pd.DataFrame(rows).sort_values(by=["dataset", "model"])
+    # sort columns for reproducible output
+    prefix_columns = ["dataset", "dataset_triples", "model", "training", "evaluation"]
+    df = df[prefix_columns + sorted(c for c in df.columns if c not in prefix_columns)]
     df.to_csv(COLLATED_PATH, sep="\t", index=False)
 
     id_vars = ["dataset", "dataset_triples", "model"]
