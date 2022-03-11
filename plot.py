@@ -1,5 +1,6 @@
 """Generate plot."""
 
+import matplotlib.pyplot as plt
 import pandas
 import scipy.constants
 import seaborn
@@ -63,6 +64,28 @@ def main():
     grid.savefig(chart_path_stub.with_suffix(".pdf"))
     grid.savefig(chart_path_stub.with_suffix(".svg"))
     grid.savefig(chart_path_stub.with_suffix(".png"), dpi=300)
+
+    # Plot summary chart
+    sliced_melted_df = melted_df[~melted_df.variable.isin({
+        "variance", "count", "median_rank", "inverse_median_rank",
+        "standard_deviation", "median_absolute_deviation",
+        "geometric_mean_rank", "harmonic_mean_rank",
+        "inverse_geometric_mean_rank", "inverse_arithmetic_mean_rank",
+        "hits_at_1", "hits_at_3",
+        "adjusted_hits_at_1", "adjusted_hits_at_3",
+        "z_hits_at_1", "z_hits_at_3",
+    })]
+    seaborn.relplot(
+        data=sliced_melted_df,
+        x="dataset_triples", y="value", hue="model",
+        col="variable",
+        col_wrap=4,
+        kind="line",
+        facet_kws={'sharey': False, 'sharex': True},
+    ).set(xscale="log")
+    summary_path_stub = CHARTS_DIRECTORY.joinpath("summary")
+    plt.savefig(summary_path_stub.with_suffix(".png"), dpi=300)
+    plt.savefig(summary_path_stub.with_suffix(".svg"))
 
 
 if __name__ == '__main__':
