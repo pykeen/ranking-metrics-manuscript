@@ -1,4 +1,0 @@
-click
-docdata
-pandas
-pykeen
