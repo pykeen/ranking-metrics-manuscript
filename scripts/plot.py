@@ -5,7 +5,7 @@ import pandas
 import scipy.constants
 import seaborn
 
-from utils import CHARTS_DIRECTORY, MELTED_PATH
+from constants import CHARTS_DIRECTORY, MELTED_PATH
 
 
 def main():

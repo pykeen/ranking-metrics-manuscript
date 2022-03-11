@@ -1,6 +1,6 @@
 from pathlib import Path
 
-HERE = Path(__file__).parent.resolve()
+HERE = Path(__file__).parent.parent.resolve()
 MODEL_DIRECTORY = HERE.joinpath("glb_results")
 
 COLLATION_DIRECTORY = HERE.joinpath("collated")

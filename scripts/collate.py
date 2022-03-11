@@ -5,7 +5,7 @@ import pandas as pd
 from docdata import get_docdata
 from pykeen.datasets import dataset_resolver
 
-from utils import COLLATED_PATH, MELTED_PATH, MODEL_DIRECTORY
+from constants import COLLATED_PATH, MELTED_PATH, MODEL_DIRECTORY
 
 
 @click.command()

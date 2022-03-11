@@ -17,7 +17,7 @@ from tqdm.auto import tqdm
 from tqdm.contrib.itertools import product as tqdm_product
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from utils import CHARTS_DIRECTORY, COLLATION_DIRECTORY, DEFAULT_CACHE_DIRECTORY
+from constants import CHARTS_DIRECTORY, COLLATION_DIRECTORY, DEFAULT_CACHE_DIRECTORY
 
 
 def _triples(dataset_cls: Type[Dataset]) -> int:
