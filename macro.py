@@ -162,9 +162,13 @@ def plot(
     """Create plot."""
     # logging setup
     logging.basicConfig(level=logging.INFO)
+
     if not dataset:
+        suffix = f"{split}_full"
         dataset = [path.name for path in directory.iterdir() if path.is_dir()]
         logging.info(f"Inferred datasets: {dataset} (by crawling {directory})")
+    else:
+        suffix = split
 
     logging.info("Calculating CDFs")
     data = []
@@ -177,7 +181,7 @@ def plot(
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
     df["target"] = df["target"].apply({"t": "tail", "h": "head"}.__getitem__)
-    df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}.tsv"), sep="\t", index=False)
+    df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}.tsv"), sep="\t", index=False)
 
     logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
@@ -204,7 +208,7 @@ def plot(
         for (dataset, side), sdf in df.groupby(["dataset", "target"])
     ]
     auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
-    auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False)
+    auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}_auc.tsv"), sep="\t", index=False)
 
     auc_diffs = []
     for dataset, sdf in auc_df.groupby("dataset"):
@@ -212,10 +216,10 @@ def plot(
         tail = sdf[sdf.target == "tail"].iloc[0].auc
         size = _triples(dataset_resolver.lookup(dataset))
         auc_diffs.append((dataset, size, head - tail))
-    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "size" "diff"])
+    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "size", "diff"])
     auc_diffs_df.sort_values("diff", inplace=True)
     auc_diffs_df.to_csv(
-        COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc_diff.tsv"),
+        COLLATED_DIRECTORY.joinpath(f"macro_{suffix}_auc_diff.tsv"),
         sep="\t",
         index=False,
     )
@@ -224,7 +228,7 @@ def plot(
     ax.set_ylabel("")
     ax.set_xlabel("AUC Difference (head - tail)")
     fig.tight_layout()
-    auc_diff_stub = CHARTS_DIRECTORY.joinpath(f"macro_{split}_auc_diff")
+    auc_diff_stub = CHARTS_DIRECTORY.joinpath(f"macro_{suffix}_auc_diff")
     fig.savefig(auc_diff_stub.with_suffix(".png"), dpi=300)
     fig.savefig(auc_diff_stub.with_suffix(".pdf"))
     fig.savefig(auc_diff_stub.with_suffix(".svg"))
@@ -233,7 +237,7 @@ def plot(
     facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
     facet_grid.set_ylabels(label="Percentage of evaluation triples")
     facet_grid.tight_layout()
-    output_stub = CHARTS_DIRECTORY.joinpath(f"macro_{split}_plot")
+    output_stub = CHARTS_DIRECTORY.joinpath(f"macro_{suffix}_plot")
     path = output_stub.with_suffix(".pdf")
     facet_grid.savefig(path)
     facet_grid.savefig(output_stub.with_suffix(".svg"))
