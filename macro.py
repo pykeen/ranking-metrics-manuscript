@@ -12,6 +12,7 @@ from docdata import get_docdata
 from matplotlib.ticker import PercentFormatter
 from pykeen.datasets import Dataset, dataset_resolver, get_dataset
 from tqdm.auto import tqdm
+from tqdm.contrib.itertools import product as tqdm_product
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 DEFAULT_DIRECTORY = pathlib.Path(tempfile.gettempdir(), "pykeen-macro")
@@ -134,7 +135,7 @@ def collect(
     "--dataset",
     multiple=True,
     type=str,
-    default=[],#("fb15k237", "kinships", "nations", "wn18rr"),
+    default=[],  # ("fb15k237", "kinships", "nations", "wn18rr"),
 )
 @click.option(
     "-s",
@@ -142,26 +143,34 @@ def collect(
     type=click.Choice(["training", "testing", "validation"]),
     default="testing",
 )
+@click.option("-p", "--palette", type=str, default=None)
 def plot(
     input_root: pathlib.Path,
     dataset: Collection[str],
     split: str,
+    palette: Optional[str],
 ):
     """Create plot."""
+    # logging setup
+    logging.basicConfig(level=logging.INFO)
     if not dataset:
         dataset = [path.name for path in input_root.iterdir() if path.is_dir()]
+        logging.info(f"Inferred datasets: {dataset} (by crawling {input_root})")
+
+    logging.info("Calculating CDFs")
     data = []
-    for ds in dataset:
-        for target in "ht":
-            df = pandas.read_csv(
-                input_root.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
-            )
-            cs = df["counts"].sort_values(ascending=False)
-            cs = cs.cumsum()
-            cdf = cs / cs.iloc[-1]
-            x = numpy.linspace(0, 1, num=len(cdf) + 1)[1:]
-            data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
+    for ds, target in tqdm_product(dataset, "ht"):
+        df = pandas.read_csv(
+            input_root.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
+        )
+        cs = df["counts"].sort_values(ascending=False)
+        cs = cs.cumsum()
+        cdf = cs / cs.iloc[-1]
+        x = numpy.linspace(0, 1, num=len(cdf) + 1)[1:]
+        data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
+
+    logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
     grid: seaborn.FacetGrid = seaborn.relplot(
         data=df,
@@ -171,13 +180,16 @@ def plot(
         kind="line",
         facet_kws=dict(xlim=[0, 1], ylim=[0, 1]),
         **kwargs,
+        palette=palette,
     )
     for ax in grid.axes.flat:
         ax.xaxis.set_major_formatter(PercentFormatter(1))
         ax.yaxis.set_major_formatter(PercentFormatter(1))
     grid.set_xlabels(label="Percentage of unique ranking tasks")
     grid.set_ylabels(label="Percentage of evaluation triples")
-    grid.savefig(input_root.joinpath("plot.pdf"))
+    path = input_root.joinpath("plot.pdf")
+    grid.savefig(path)
+    logging.info(f"Saved to {path}")
 
 
 if __name__ == "__main__":
