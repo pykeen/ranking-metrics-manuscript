@@ -184,6 +184,7 @@ def plot(
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
     df["target"] = df["target"].apply({"t": "tail", "h": "head"}.__getitem__)
+    df.to_csv(HERE.joinpath("collated", "macro.tsv"), sep="\t", index=False)
 
     logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
