@@ -222,10 +222,10 @@ def plot(
     for dataset, sdf in auc_df.groupby("dataset"):
         head = sdf[sdf.target == "head"].iloc[0].auc
         tail = sdf[sdf.target == "tail"].iloc[0].auc
-        auc_diffs.append((dataset, head - tail))
-    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "diff"]).sort_values(
-        "diff"
-    )
+        size = _triples(dataset_resolver.lookup(dataset))
+        auc_diffs.append((dataset,size,  head - tail))
+    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "size" "diff"])
+    auc_diffs_df.sort_values("diff", inplace=True)
     auc_diffs_df.to_csv(
         COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc_diff.tsv"),
         sep="\t",
