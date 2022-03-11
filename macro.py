@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Collection, Iterable, Optional, Tuple, Type
 
 import click
+import matplotlib.pyplot as plt
 import numpy
 import pandas
 import seaborn
@@ -213,15 +214,33 @@ def plot(
         for (dataset, side), sdf in df.groupby(["dataset", "target"])
     ]
     auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
-    auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False)
+    auc_df.to_csv(
+        COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False
+    )
 
     auc_diffs = []
     for dataset, sdf in auc_df.groupby("dataset"):
         head = sdf[sdf.target == "head"].iloc[0].auc
         tail = sdf[sdf.target == "tail"].iloc[0].auc
-        auc_diffs.append((dataset, head-tail))
-    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "diff"]).sort_values("diff")
-    auc_diffs_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc_diff.tsv"), sep="\t", index=False)
+        auc_diffs.append((dataset, head - tail))
+    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "diff"]).sort_values(
+        "diff"
+    )
+    auc_diffs_df.to_csv(
+        COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc_diff.tsv"),
+        sep="\t",
+        index=False,
+    )
+    fig, ax = plt.subplots()
+    seaborn.barplot(data=auc_diffs_df, y="dataset", x="diff", ax=ax)
+    ax.set_ylabel("")
+    ax.set_xlabel("AUC Difference (head - tail)")
+    fig.tight_layout()
+    auc_diff_stub = CHARTS_DIRECTORY.joinpath(f"macro_{split}_auc_diff")
+    fig.savefig(auc_diff_stub.with_suffix(".png"), dpi=300)
+    fig.savefig(auc_diff_stub.with_suffix(".pdf"))
+    fig.savefig(auc_diff_stub.with_suffix(".svg"))
+    plt.close(fig)
 
     facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
     facet_grid.set_ylabels(label="Percentage of evaluation triples")
