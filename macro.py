@@ -215,6 +215,14 @@ def plot(
     auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
     auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc.tsv"), sep="\t", index=False)
 
+    auc_diffs = []
+    for dataset, sdf in auc_df.groupby("dataset"):
+        head = sdf[sdf.target == "head"].iloc[0].auc
+        tail = sdf[sdf.target == "tail"].iloc[0].auc
+        auc_diffs.append((dataset, head-tail))
+    auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "diff"]).sort_values("diff")
+    auc_diffs_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{split}_auc_diff.tsv"), sep="\t", index=False)
+
     facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
     facet_grid.set_ylabels(label="Percentage of evaluation triples")
     facet_grid.tight_layout()
