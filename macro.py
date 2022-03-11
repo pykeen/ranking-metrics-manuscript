@@ -1,7 +1,7 @@
-"""Investigate effect of micro vs. macro."""
+"""Investigate effect of micro vs. macro evaluation."""
+
 import logging
-import pathlib
-import tempfile
+from pathlib import Path
 from typing import Collection, Iterable, Optional, Tuple, Type
 
 import click
@@ -15,7 +15,10 @@ from tqdm.auto import tqdm
 from tqdm.contrib.itertools import product as tqdm_product
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-DEFAULT_DIRECTORY = pathlib.Path(tempfile.gettempdir(), "pykeen-macro")
+HERE = Path(__file__).parent.resolve()
+DEFAULT_CACHE_DIRECTORY = HERE.joinpath("macro_cache")
+CHARTS_DIRECTORY = HERE.joinpath("charts")
+CHARTS_DIRECTORY.mkdir(exist_ok=True)
 
 
 def _triples(dataset_cls: Type[Dataset]) -> int:
@@ -51,7 +54,6 @@ def _iter_counts(
 
             # for each side prediction
             for target in "ht":
-
                 # group by other columns
                 keys = [c for c in df.columns if c != target]
                 group = df.groupby(by=keys)
@@ -62,12 +64,17 @@ def _iter_counts(
                 yield dataset_name, split, target, df.shape[0], counts
 
 
-def _save(df: pandas.DataFrame, output_directory: pathlib.Path, *keys: str):
+def _save(df: pandas.DataFrame, output_directory: Path, *keys: str):
     """Save dataframe under directory."""
     path = output_directory.joinpath(*keys).with_suffix(suffix=".tsv.gz")
     path.parent.mkdir(exist_ok=True, parents=True)
     df.to_csv(path, sep="\t", index=False)
     logging.debug(f"Written to {path}")
+
+
+directory_option = click.option(
+    "--directory", type=Path, default=DEFAULT_CACHE_DIRECTORY
+)
 
 
 @click.group()
@@ -77,15 +84,18 @@ def main():
 
 @main.command()
 @click.option("-m", "--max-triples", type=int, default=None)
-@click.option("-o", "--output-directory", type=pathlib.Path, default=DEFAULT_DIRECTORY)
+@directory_option
 def collect(
     max_triples: Optional[int],
-    output_directory: pathlib.Path,
+    directory: Path,
 ):
     """Collect statistics across datasets."""
     # logging setup
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("pykeen.triples").setLevel(level=logging.ERROR)
+
+    # make sure the directory exists
+    directory.mkdir(exist_ok=True, parents=True)
 
     # aggregate basic statistics across all datasets
     summary = []
@@ -105,7 +115,7 @@ def collect(
 
             # store distribution
             df = pandas.DataFrame(data=dict(counts=counts))
-            _save(df, output_directory, dataset_name, split, target)
+            _save(df, directory, dataset_name, split, target)
 
     # store summary
     df = pandas.DataFrame(
@@ -125,11 +135,11 @@ def collect(
             "max",
         ],
     )
-    _save(df, output_directory, "summary")
+    _save(df, directory, "summary")
 
 
 @main.command()
-@click.option("-i", "--input-root", type=pathlib.Path, default=DEFAULT_DIRECTORY)
+@directory_option
 @click.option(
     "-d",
     "--dataset",
@@ -145,9 +155,9 @@ def collect(
 )
 @click.option("-p", "--palette", type=str, default=None)
 @click.option("-g", "--grid", is_flag=True)
-@click.option("-h", "--height", type=float, default=None)
+@click.option("-h", "--height", type=float, default=5, show_default=True)
 def plot(
-    input_root: pathlib.Path,
+    directory: Path,
     dataset: Collection[str],
     split: str,
     palette: Optional[str],
@@ -158,14 +168,14 @@ def plot(
     # logging setup
     logging.basicConfig(level=logging.INFO)
     if not dataset:
-        dataset = [path.name for path in input_root.iterdir() if path.is_dir()]
-        logging.info(f"Inferred datasets: {dataset} (by crawling {input_root})")
+        dataset = [path.name for path in directory.iterdir() if path.is_dir()]
+        logging.info(f"Inferred datasets: {dataset} (by crawling {directory})")
 
     logging.info("Calculating CDFs")
     data = []
     for ds, target in tqdm_product(dataset, "ht"):
         df = pandas.read_csv(
-            input_root.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
+            directory.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t"
         )
         cs = df["counts"].sort_values(ascending=False)
         cs = cs.cumsum()
@@ -196,8 +206,11 @@ def plot(
     facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
     facet_grid.set_ylabels(label="Percentage of evaluation triples")
     facet_grid.tight_layout()
-    path = input_root.joinpath("plot.pdf")
+    output_stub = CHARTS_DIRECTORY.joinpath("micro_macro_plot")
+    path = output_stub.with_suffix(".pdf")
     facet_grid.savefig(path)
+    facet_grid.savefig(output_stub.with_suffix(".svg"))
+    facet_grid.savefig(output_stub.with_suffix(".png"), dpi=300)
     logging.info(f"Saved to {path}")
 
 
