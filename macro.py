@@ -181,7 +181,7 @@ def plot(
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
     df = pandas.DataFrame(data, columns=["dataset", "target", "x", "y"])
     df["target"] = df["target"].apply({"t": "tail", "h": "head"}.__getitem__)
-    df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}.tsv"), sep="\t", index=False)
+    df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}.tsv.gz"), sep="\t", index=False)
 
     logging.info(f"Creating plot for {len(dataset)} datasets.")
     kwargs = dict(style="target") if len(dataset) < 5 else dict(col="target")
@@ -210,6 +210,7 @@ def plot(
     auc_df = pandas.DataFrame(auc_rows, columns=["dataset", "target", "auc"])
     auc_df.to_csv(COLLATED_DIRECTORY.joinpath(f"macro_{suffix}_auc.tsv"), sep="\t", index=False)
 
+    logging.info("Calculating area under the curve")
     auc_diffs = []
     for dataset, sdf in auc_df.groupby("dataset"):
         head = sdf[sdf.target == "head"].iloc[0].auc
