@@ -1,5 +1,7 @@
 # Ranking Metrics Manuscript Supplement
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6347429.svg)](https://doi.org/10.5281/zenodo.6347429)
+
 This repository contains analysis and supplementary information
 for _A Unified Framework for Rank-based Evaluation
 Metrics for Link Prediction_, non-archivally submitted to
