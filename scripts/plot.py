@@ -56,7 +56,7 @@ def main():
         sharey=False,
         # facet_kws=dict(sharey=False),
         kind="bar",
-        height=3,
+        height=2.2,
         aspect=scipy.constants.golden,
     )
     # grid.set_xticklabels(rotation=30, ha="right")
@@ -67,7 +67,7 @@ def main():
             ax.set_ylim([0, 1])
     grid.set_ylabels(label=base_metric_name)
     grid.set_xlabels(label="")
-    grid.set_titles(col_template="{col_name}")
+    grid.set_titles(col_template="{col_name}", size=13)
     grid.tight_layout()
 
     chart_path_stub = CHARTS_DIRECTORY.joinpath(f"{base_metric_key}_plot")
