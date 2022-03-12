@@ -21,32 +21,45 @@ def main():
     # filter
     df = melted_df[melted_df["variable"].isin(metrics) & (melted_df["model"] != "rotate")].copy()
 
-    rename = {
+    metric_rename = {
         "inverse_harmonic_mean_rank": "Original",
         "z_inverse_harmonic_mean_rank": "z-Adjusted Metric",
         "adjusted_inverse_harmonic_mean_rank": "Adjusted Index",
     }
-    df.loc[:, "variable"] = df["variable"].apply(rename.__getitem__)
-    metrics = [rename[m] for m in metrics]
+    model_rename = {
+        "complex": "ComplEx",
+        "tucker": "TuckER",
+        "rotate": "RotatE",
+        "transe": "TransE",
+    }
+    dataset_rename = {
+        "fb15k237": "FB15k-237",
+        "wn18rr": "WN18-RR",
+        "nations": "Nations",
+        "kinships": "Kinships",
+    }
+
+    df.loc[:, "variable"] = df["variable"].map(metric_rename)
+    df.loc[:, "model"] = df["model"].map(model_rename)
+    df.loc[:, "dataset"] = df["dataset"].map(dataset_rename)
+    metrics = [metric_rename[m] for m in metrics]
 
     grid: seaborn.FacetGrid = seaborn.catplot(
         data=df,
-        # x="dataset",
-        # order=["fb15k237", "wn18rr", "nations", "kinships"],
         x="model",
         y="value",
         col="variable",
         col_order=metrics,
         # hue="model",
         hue="dataset",
-        hue_order=["fb15k237", "wn18rr", "nations", "kinships"],
+        hue_order=["FB15k-237", "WN18-RR", "Nations", "Kinships"],
         sharey=False,
         # facet_kws=dict(sharey=False),
         kind="bar",
         height=3,
-        aspect=scipy.constants.golden ** (-1),
+        aspect=scipy.constants.golden,
     )
-    grid.set_xticklabels(rotation=45, ha="right")
+    # grid.set_xticklabels(rotation=30, ha="right")
     for key, ax in grid.axes_dict.items():
         if key == "z-Adjusted Metric":
             ax.set_yscale("log")
