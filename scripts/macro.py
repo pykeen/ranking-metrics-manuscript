@@ -2,71 +2,69 @@
 
 import logging
 from pathlib import Path
-from typing import Collection, Iterable, Optional, Tuple, Type
+from typing import Collection, Iterable, Optional, Tuple
 
 import click
 import matplotlib.pyplot as plt
 import numpy
 import pandas
 import seaborn
-from docdata import get_docdata
 from matplotlib.ticker import PercentFormatter
-from pykeen.datasets import Dataset, dataset_resolver, get_dataset
 from sklearn.metrics import auc
 from tqdm.auto import tqdm
 from tqdm.contrib.itertools import product as tqdm_product
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from constants import CHARTS_DIRECTORY, COLLATION_DIRECTORY, DEFAULT_CACHE_DIRECTORY
-
-
-def _triples(dataset_cls: Type[Dataset]) -> int:
-    """Extract the number of triples from docdata."""
-    return get_docdata(dataset_cls)["statistics"]["triples"]
+from pykeen.datasets import Dataset, dataset_resolver
+from pykeen.datasets.utils import iter_dataset_instances, max_triples_option
 
 
 def _iter_counts(
-    max_triples: Optional[int],
+    *,
+    min_triples: Optional[int] = None,
+    max_triples: Optional[int] = None,
+    directory: Path,
+    force: bool = False,
 ) -> Iterable[Tuple[str, str, str, int, pandas.Series]]:
     """Iterate over datasets/splits/targets and the respective counts."""
-    for dataset_name, dataset_cls in sorted(
-        dataset_resolver.lookup_dict.items(), key=lambda pair: _triples(pair[1])
+    for dataset_name, dataset in iter_dataset_instances(
+        min_triples=min_triples, max_triples=max_triples
     ):
-        # skip large datasets
-        if max_triples and _triples(dataset_cls) > max_triples:
-            continue
-
-        # skip unavailable datasets
-        try:
-            dataset = get_dataset(dataset=dataset_name)
-        except Exception as error:
-            logging.error(str(error))
-            continue
-
         # investigate triples for all splits
-        for split, factory in dataset.factory_dict.items():
+        split_it = tqdm(dataset.factory_dict.items(), desc="Splits", leave=False)
+        for split, factory in split_it:
+            split_it.set_postfix(split=split)
 
             # convert to pandas dataframe
-            df = pandas.DataFrame(factory.mapped_triples.numpy(), columns=["h", "r", "t"])
+            split_df = pandas.DataFrame(factory.mapped_triples.numpy(), columns=["h", "r", "t"])
+            split_triples = split_df.shape[0]
 
             # for each side prediction
-            for target in "ht":
-                # group by other columns
-                keys = [c for c in df.columns if c != target]
-                group = df.groupby(by=keys)
+            target_it = tqdm("ht", desc="Target", leave=False)
+            for target in target_it:
+                target_it.set_postfix(target=target)
 
-                # count number of unique targets per key
-                counts = group.agg({target: "nunique"})[target]
+                path = directory.joinpath(dataset_name, split, target).with_suffix(suffix=".tsv.gz")
+                if path.is_file() and not force:
+                    logging.info(f"using cache at {path}")
+                    counts_series = pandas.read_csv(path, sep="\t", squeeze=True)
+                else:
+                    # group by other columns
+                    keys = [column for column in split_df.columns if column != target]
+                    group = split_df.groupby(by=keys)
 
-                yield dataset_name, split, target, df.shape[0], counts
+                    # count number of unique targets per key
+                    counts_series = group.agg({target: "nunique"})[target]
 
+                    # store distribution
 
-def _save(df: pandas.DataFrame, output_directory: Path, *keys: str):
-    """Save dataframe under directory."""
-    path = output_directory.joinpath(*keys).with_suffix(suffix=".tsv.gz")
-    path.parent.mkdir(exist_ok=True, parents=True)
-    df.to_csv(path, sep="\t", index=False)
-    logging.debug(f"Written to {path}")
+                    # df = pandas.DataFrame(data=dict(counts=counts))
+                    counts_series.to_csv(path, sep="\t", index=False)
+                    logging.debug(f"wrote cache to {path}")
+
+                description = counts_series.describe().tolist()
+                yield dataset_name, split, target, split_triples, counts_series, description
 
 
 directory_option = click.option("--directory", type=Path, default=DEFAULT_CACHE_DIRECTORY)
@@ -78,7 +76,7 @@ def main():
 
 
 @main.command()
-@click.option("-m", "--max-triples", type=int, default=None)
+@max_triples_option
 @directory_option
 def collect(
     max_triples: Optional[int],
@@ -88,29 +86,20 @@ def collect(
     # logging setup
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("pykeen.triples").setLevel(level=logging.ERROR)
-
-    # make sure the directory exists
     directory.mkdir(exist_ok=True, parents=True)
 
-    # aggregate basic statistics across all datasets
-    summary = []
-
-    # iterate over all datasets
-    with logging_redirect_tqdm(), tqdm(_iter_counts(max_triples=max_triples)) as progress:
-        for dataset_name, split, target, num_triples, counts in progress:
-            progress.set_postfix(datase=dataset_name, split=split, target=target)
-
-            # append basic statistics to summary data(-frame)
-            description = counts.describe()
-            summary.append((dataset_name, split, target, num_triples, *description.tolist()))
-
-            # store distribution
-            df = pandas.DataFrame(data=dict(counts=counts))
-            _save(df, directory, dataset_name, split, target)
+    with logging_redirect_tqdm():
+        # aggregate basic statistics across all datasets
+        rows = [
+            (dataset_name, split, target, num_triples, *description)
+            for dataset_name, split, target, num_triples, counts_series, description in _iter_counts(
+                max_triples=max_triples, directory=directory
+            )
+        ]
 
     # store summary
-    df = pandas.DataFrame(
-        data=summary,
+    summary_df = pandas.DataFrame(
+        data=rows,
         columns=[
             "dataset",
             "split",
@@ -126,7 +115,9 @@ def collect(
             "max",
         ],
     )
-    _save(df, directory, "summary")
+    summary_path = directory.joinpath("summary").with_suffix(suffix=".tsv.gz")
+    summary_df.to_csv(summary_path, sep="\t", index=False)
+    logging.debug(f"Wrote summary to {summary_path}")
 
 
 @main.command()
@@ -169,9 +160,9 @@ def plot(
     logging.info("Calculating CDFs")
     data = []
     for ds, target in tqdm_product(dataset, "ht"):
-        df = pandas.read_csv(directory.joinpath(ds, split, target).with_suffix(".tsv.gz"), sep="\t")
-        cs = df["counts"].sort_values(ascending=False)
-        cs = cs.cumsum()
+        path = directory.joinpath(ds, split, target).with_suffix(".tsv.gz")
+        counts_series: pandas.Series = pandas.read_csv(path, sep="\t", squeeze=True)
+        cs = counts_series.sort_values(ascending=False).cumsum()
         cdf = cs / cs.iloc[-1]
         x = numpy.linspace(0, 1, num=len(cdf) + 1)[1:]
         data.extend((ds, target, xx, yy) for xx, yy in zip(x, cdf))
@@ -211,7 +202,7 @@ def plot(
     for dataset, sdf in auc_df.groupby("dataset"):
         head = sdf[sdf.target == "head"].iloc[0].auc
         tail = sdf[sdf.target == "tail"].iloc[0].auc
-        size = _triples(dataset_resolver.lookup(dataset))
+        size = Dataset.triples_sort_key(dataset_resolver.lookup(dataset))
         auc_diffs.append((dataset, size, head - tail))
     auc_diffs_df = pandas.DataFrame(auc_diffs, columns=["dataset", "size", "diff"])
     auc_diffs_df.sort_values("diff", inplace=True)
@@ -232,7 +223,7 @@ def plot(
     plt.close(fig)
 
     facet_grid.set_xlabels(label="Percentage of unique ranking tasks")
-    facet_grid.set_ylabels(label="Percentage of evaluation triples")
+    facet_grid.set_ylabels(label=f"Percentage of {split} triples")
     facet_grid.tight_layout()
     output_stub = CHARTS_DIRECTORY.joinpath(f"macro_{suffix}_plot")
     path = output_stub.with_suffix(".pdf")
