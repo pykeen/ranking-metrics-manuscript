@@ -24,7 +24,7 @@ achieving better unnormalized performance.
 ## Citation
 
 ```bibtex
-@book{hoyt2022,
+@article{hoyt2022,
    author = {Hoyt, Charles Tapley and Berrendorf, Max and Gaklin, Mikhail and Tresp, Volker and Gyori, Benjamin M},
    title = {{A Unified Framework for Rank-based Evaluation Metrics for Link Prediction}},
    year = {2022}
