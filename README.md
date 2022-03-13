@@ -15,12 +15,11 @@ have a dataset size-correlation and are therefore comparable across datasets.
 ![Results](charts/mean_reciprocal_rank_plot.svg)
 
 🖼️ **Figure Summary** 🖼️ While the MRR on, e.g., Nations and WN18-RR appears
-similar for ComplEx, the
-_adjusted index_ reveals that when adjusting for chance, the performance on (the
-larger) WN18-RR is more remarkable. The _z-adjusted_ metric allows an easier
-direct comparison against the baseline that suggests the results on smaller
-datasets are less considerable, despite achieving better unnormalized
-performance. ¬
+similar for ComplEx, the _adjusted index_ reveals that when adjusting for
+chance, the performance on (the larger) WN18-RR is more remarkable. The
+_z-adjusted_ metric allows an easier direct comparison against the baseline that
+suggests the results on smaller datasets are less considerable, despite
+achieving better unnormalized performance.
 
 ## Citation
 
