@@ -10,7 +10,7 @@ submitted to [GLB 2022](https://graph-learning-benchmarks.github.io/glb2022).
 evaluation metrics like mean rank (MR), mean reciprocal rank (MRR), and hits at
 k (H@K) that makes them impossible to compare across datasets. We used the
 expectation and variance of each metric to define adjusted metrics that don't
-have a dataset size-correlation and are therefore comparable across datasets.
+have a dataset size-correlation and more easily comparable across datasets.
 
 ![Results](charts/mean_reciprocal_rank_plot.svg)
 
@@ -21,7 +21,18 @@ _z-adjusted_ metric allows an easier direct comparison against the baseline that
 suggests the results on smaller datasets are less considerable, despite
 achieving better unnormalized performance.
 
-## Citation
+## ♻️ Reproduction
+
+After installing `tox` with `pip install tox`, do the following:
+
+1. `tox -e collate` to build the combine results files
+2. `tox -e plot` to summarize the results files as plots
+3. `tox -e macro` to run the analysis for micro vs. macro evaluation (not
+   actually presented in the paper)
+
+## 👋 Attribution
+
+### 📖 Citation
 
 ```bibtex
 @article{hoyt2022,
@@ -31,11 +42,26 @@ achieving better unnormalized performance.
 }
 ```
 
-## Build
+### ⚖️ License
 
-After installing `tox` with `pip install tox`, do the following:
+The code in this package is licensed under the MIT License. The model, data,
+and results are licensed under the CC Zero license.
 
-1. `tox -e collate` to build the combine results files
-2. `tox -e plot` to summarize the results files as plots
-3. `tox -e macro` to run the analysis for micro vs. macro evaluation (not
-   actually presented in the paper)
+### 🎁 Support
+
+This project has been supported by several organizations (in alphabetical order):
+
+- [Harvard Program in Therapeutic Science - Laboratory of Systems Pharmacology](https://hits.harvard.edu/the-program/laboratory-of-systems-pharmacology/)
+- [Ludwig-Maximilians-Universität München](https://www.en.uni-muenchen.de/index.html)
+- [Mila](https://mila.quebec/)
+- [Munich Center for Machine Learning (MCML)](https://mcml.ai/)
+
+### 🏦 Funding
+
+This project has been funded by the following grants:
+
+| Funding Body                                             | Program                                                                          | Grant         |
+|----------------------------------------------------------|----------------------------------------------------------------------------------|---------------|
+| DARPA                                                    | [Young Faculty Award (PI: Benjamin Gyori)](https://indralab.github.io/#projects) | W911NF2010255 |
+| German Federal Ministry of Education and Research (BMBF) | [Munich Center for Machine Learning (MCML)](https://mcml.ai)                     | 01IS18036A    |
+| Samsung                                                  | Samsung AI Grant                                                                 | -             |
