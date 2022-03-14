@@ -34,15 +34,15 @@ METRICS = {
             "z_inverse_harmonic_mean_rank",
         ],
     },
-    # "arithmetic_mean_rank": {
-    #     "base_title": "Mean Rank",
-    #     "base_yscale": "log",
-    #     "metrics": [
-    #         "arithmetic_mean_rank",
-    #         "adjusted_arithmetic_mean_rank_index",
-    #         "z_arithmetic_mean_rank",
-    #     ],
-    # },
+    "arithmetic_mean_rank": {
+        "base_title": "Mean Rank",
+        "base_yscale": "log",
+        "metrics": [
+            "arithmetic_mean_rank",
+            "adjusted_arithmetic_mean_rank_index",
+            "z_arithmetic_mean_rank",
+        ],
+    },
     "hits_at_10": {
         "base_title": "Hits at 10",
         "base_ylim": [0, 1],
