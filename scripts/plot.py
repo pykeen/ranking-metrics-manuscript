@@ -6,6 +6,12 @@ import scipy.constants
 import seaborn as sns
 
 from constants import CHARTS_DIRECTORY, MELTED_PATH
+from pykeen.datasets import dataset_resolver
+
+SIGIL = r"\mathcal{T}_{train}"
+
+def _lookup_key(d):
+    return dataset_resolver.docdata(d, 'statistics', 'training')
 
 MODEL_TITLES = {
     "complex": "ComplEx",
@@ -19,6 +25,15 @@ DATASET_TITLES = {
     "nations": "Nations",
     "kinships": "Kinships",
 }
+DATASET_TITLES = {
+    key: f"{value} ($|{SIGIL}|={_lookup_key(key):,}$)"
+    for key, value in DATASET_TITLES.items()
+}
+# show datasets in increasing order of entity size
+DATASET_ORDER = [
+    v
+    for _, v in sorted(DATASET_TITLES.items(), key=lambda pair: _lookup_key(pair[0]))
+]
 ORDER = [
     "Original",
     "Adjusted Index",
@@ -79,11 +94,11 @@ def main():
             col_order=metric_order,
             # hue="model",
             hue="dataset",
-            hue_order=["FB15k-237", "WN18-RR", "Nations", "Kinships"],
+            hue_order=DATASET_ORDER,
             sharey=False,
             # facet_kws=dict(sharey=False),
             kind="bar",
-            height=2.2,
+            height=2.4,
             aspect=scipy.constants.golden,
         )
         # grid.set_xticklabels(rotation=30, ha="right")
