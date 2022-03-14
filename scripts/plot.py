@@ -10,8 +10,10 @@ from pykeen.datasets import dataset_resolver
 
 SIGIL = r"\mathcal{T}_{train}"
 
+
 def _lookup_key(d):
     return dataset_resolver.docdata(d, 'statistics', 'training')
+
 
 MODEL_TITLES = {
     "complex": "ComplEx",
