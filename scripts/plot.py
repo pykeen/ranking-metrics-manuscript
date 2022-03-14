@@ -19,7 +19,7 @@ def main():
     ]
 
     # filter
-    df = melted_df[melted_df["variable"].isin(metrics) & (melted_df["model"] != "rotate")].copy()
+    df = melted_df[melted_df["variable"].isin(metrics)].copy()
 
     metric_rename = {
         "inverse_harmonic_mean_rank": "Original",
