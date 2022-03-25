@@ -18,7 +18,7 @@ sns.set_style("white")
 
 def main():
     num_samples = 500  # any bigger is unnecessary
-    num_candidates = np.logspace(np.log10(2), 8, num=60).reshape(-1, 1).astype(int)
+    num_candidates = np.logspace(np.log10(2), 9, num=60).reshape(-1, 1).astype(int)
     inverse_metrics = [
         InverseHarmonicMeanRank(),
         InverseArithmeticMeanRank(),
@@ -37,7 +37,7 @@ def main():
         metrics, num_candidates=num_candidates, num_samples=num_samples,
     )
 
-    fig, ((lax, rax), (lax_inv, rax_inv)) = plt.subplots(2, 2, figsize=(10, 7), sharex="all")
+    fig, ((lax, rax), (lax_inv, rax_inv)) = plt.subplots(2, 2, figsize=(10, 7))
 
     sns.lineplot(data=normal_df, x="candidate", y="expectation", hue="metric", ax=lax)
     lax.set_xlabel("")
