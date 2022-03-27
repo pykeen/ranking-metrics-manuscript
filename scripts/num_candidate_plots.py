@@ -1,89 +1,113 @@
 """Generate plot of number of candidates vs expectation and variance."""
 
-import matplotlib.pyplot as plt
+import click
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from tqdm.contrib.itertools import product
-
-from constants import CHARTS_DIRECTORY
+from constants import CHARTS_DIRECTORY, COLLATION_DIRECTORY
+from more_click import force_option
 from pykeen.metrics import RankBasedMetric
 from pykeen.metrics.ranking import (
-    ArithmeticMeanRank, GeometricMeanRank, HarmonicMeanRank, HitsAtK, InverseArithmeticMeanRank,
-    InverseGeometricMeanRank, InverseHarmonicMeanRank,
+    ArithmeticMeanRank,
+    GeometricMeanRank,
+    HarmonicMeanRank,
+    HitsAtK,
+    InverseArithmeticMeanRank,
+    InverseGeometricMeanRank,
+    InverseHarmonicMeanRank,
 )
+from tqdm import tqdm
 
-sns.set_style("white")
+CANDIDATE_PATH = COLLATION_DIRECTORY.joinpath("candidates.tsv")
+CHART_STUB = CHARTS_DIRECTORY.joinpath("candidate_plot")
 
 
-def main():
-    num_samples = 500  # any bigger is unnecessary
-    num_candidates = np.logspace(np.log10(2), 9, num=60).reshape(-1, 1).astype(int)
-    inverse_metrics = [
-        InverseHarmonicMeanRank(),
-        InverseArithmeticMeanRank(),
-        InverseGeometricMeanRank(),
-        HitsAtK(10),
-    ]
-    metrics = [
+@click.command()
+def main(
+    force: bool = True,
+    num_samples: int = 1_000,
+    min_log10: int = 0,
+    max_log10: int = 6,
+    points: int = 40,
+):
+    sizes = np.logspace(min_log10, max_log10, num=points).astype(int)
+
+    normal_metrics = [
         HarmonicMeanRank(),
         ArithmeticMeanRank(),
         GeometricMeanRank(),
     ]
-    inverse_df = _get_dfs(
-        inverse_metrics, num_candidates=num_candidates, num_samples=num_samples,
+    inverse_metrics = [
+        InverseHarmonicMeanRank(),
+        InverseArithmeticMeanRank(),
+        InverseGeometricMeanRank(),
+        *(HitsAtK(10**x) for x in range(max_log10 // 2)),
+    ]
+    metrics = [
+        *((metric, False) for metric in normal_metrics),
+        *((metric, True) for metric in inverse_metrics),
+    ]
+
+    if CANDIDATE_PATH.is_file() and not force:
+        df = pd.read_csv(CANDIDATE_PATH, sep="\t")
+    else:
+        df = _get_df(
+            metrics,
+            sizes=sizes,
+            num_samples=num_samples,
+        )
+        df.to_csv(CANDIDATE_PATH, sep="\t", index=False)
+
+    g = sns.relplot(
+        data=df.melt(
+            id_vars=["metric", "candidate", "inverted"],
+            value_vars=["expectation", "variance"],
+        ),
+        x="candidate",
+        y="value",
+        col="variable",
+        row="inverted",
+        hue="metric",
+        kind="line",
+        facet_kws={"sharey": False, "sharex": True},
+        height=3.5,
+        aspect=1.6,
     )
-    normal_df = _get_dfs(
-        metrics, num_candidates=num_candidates, num_samples=num_samples,
-    )
-
-    fig, ((lax, rax), (lax_inv, rax_inv)) = plt.subplots(2, 2, figsize=(10, 7))
-
-    sns.lineplot(data=normal_df, x="candidate", y="expectation", hue="metric", ax=lax)
-    lax.set_xlabel("")
-    lax.set_ylabel("Expectation")
-    lax.set_xscale("log")
-    # lax.set_yscale("log")
-
-    sns.lineplot(data=normal_df, x="candidate", y="variance", hue="metric", ax=rax)
-    rax.set_xlabel("")
-    rax.set_ylabel("Variance")
-    rax.set_xscale("log")
-
-    sns.lineplot(data=inverse_df, x="candidate", y="expectation", hue="metric", ax=lax_inv)
-    lax_inv.set_xlabel("Number of Candidates")
-    lax_inv.set_ylabel("Expectation")
-    lax_inv.set_xscale("log")
-
-    sns.lineplot(data=inverse_df, x="candidate", y="variance", hue="metric", ax=rax_inv)
-    rax_inv.set_xlabel("Number of Candidates")
-    rax_inv.set_ylabel("Variance")
-    rax_inv.set_xscale("log")
-
-    fig.tight_layout()
-    fig.savefig(CHARTS_DIRECTORY.joinpath("candidate_plot.svg"))
-    fig.savefig(CHARTS_DIRECTORY.joinpath("candidate_plot.png"), dpi=300)
-    fig.savefig(CHARTS_DIRECTORY.joinpath("candidate_plot.pdf"))
+    g.set(xscale="log", yscale="log", ylabel="")
+    g.tight_layout()
+    g.savefig(CHART_STUB.with_suffix(".png"), dpi=300)
+    g.savefig(CHART_STUB.with_suffix(".svg"))
+    g.savefig(CHART_STUB.with_suffix(".pdf"))
 
 
-def _get_dfs(
+def _get_df(
     metrics: list[RankBasedMetric],
-    num_candidates: np.ndarray,
+    sizes: np.ndarray,
     num_samples: int,
 ) -> pd.DataFrame:
-    return pd.DataFrame(
-        [
-            (
-                metric.__class__.__name__,
-                candidate[0].item(),
-                metric.expected_value(candidate, num_samples),
-                metric.variance(candidate, num_samples),
+    rows = []
+    outer_it = tqdm(sizes)
+    for size in outer_it:
+        size_item = size.item()
+        outer_it.set_postfix(size=size_item)
+        num_candidates = np.array([size_item for _ in range(size_item)])
+        inner_it = tqdm(metrics, leave=False)
+        for metric, inverted in inner_it:
+            inner_it.set_postfix(metric=metric)
+            rows.append(
+                (
+                    metric.key.removeprefix("inverse_"),
+                    inverted,
+                    size_item,
+                    metric.expected_value(num_candidates=num_candidates, num_samples=num_samples),
+                    metric.variance(num_candidates=num_candidates, num_samples=num_samples),
+                )
             )
-            for metric, candidate in product(metrics, num_candidates, unit_scale=True, desc="calculating properties")
-        ],
-        columns=["metric", "candidate", "expectation", "variance"]
+    return pd.DataFrame(
+        rows,
+        columns=["metric", "inverted", "candidate", "expectation", "variance"],
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
