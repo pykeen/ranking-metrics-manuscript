@@ -60,6 +60,7 @@ METRICS = {
             "adjusted_arithmetic_mean_rank_index",
             "z_arithmetic_mean_rank",
         ],
+        "short": ["MR", "AMRI", "ZMR"],
         "has_negative_z": True,
     },
     "hits_at_10": {
