@@ -6,6 +6,14 @@ import scipy.constants
 import seaborn as sns
 
 from constants import CHARTS_DIRECTORY, MELTED_PATH
+from pykeen.datasets import dataset_resolver
+
+SIGIL = r"\mathcal{T}_{train}"
+
+
+def _lookup_key(d):
+    return dataset_resolver.docdata(d, 'statistics', 'training')
+
 
 MODEL_TITLES = {
     "complex": "ComplEx",
@@ -19,6 +27,15 @@ DATASET_TITLES = {
     "nations": "Nations",
     "kinships": "Kinships",
 }
+DATASET_TITLES = {
+    key: f"{value} ($|{SIGIL}|={_lookup_key(key):,}$)"
+    for key, value in DATASET_TITLES.items()
+}
+# show datasets in increasing order of entity size
+DATASET_ORDER = [
+    v
+    for _, v in sorted(DATASET_TITLES.items(), key=lambda pair: _lookup_key(pair[0]))
+]
 ORDER = [
     "Original",
     "Adjusted Index",
@@ -33,6 +50,7 @@ METRICS = {
             "adjusted_inverse_harmonic_mean_rank",
             "z_inverse_harmonic_mean_rank",
         ],
+        "short": ["MRR", "AMRR", "ZMRR"],
     },
     "arithmetic_mean_rank": {
         "base_title": "Mean Rank",
@@ -52,6 +70,7 @@ METRICS = {
             "adjusted_hits_at_10",
             "z_hits_at_10",
         ],
+        "short": ["$H_{10}$", "$AH_{10}$", "$ZH_{10}$"],
     },
 }
 
@@ -65,32 +84,36 @@ def main():
     for base_metric_key, metadata in METRICS.items():
         metrics = metadata["metrics"]
         df = melted_df[melted_df["variable"].isin(metrics)].copy()
-        df.loc[:, "variable"] = df["variable"].map(dict(zip(metrics, ORDER)))
+        metric_order = [
+            f"{order} ({short})"
+            for order, short in zip(ORDER, metadata["short"])
+        ]
+        df.loc[:, "variable"] = df["variable"].map(dict(zip(metrics, metric_order)))
         grid: sns.FacetGrid = sns.catplot(
             data=df,
             x="model",
             y="value",
             col="variable",
-            col_order=ORDER,
+            col_order=metric_order,
             # hue="model",
             hue="dataset",
-            hue_order=["FB15k-237", "WN18-RR", "Nations", "Kinships"],
+            hue_order=DATASET_ORDER,
             sharey=False,
             # facet_kws=dict(sharey=False),
             kind="bar",
-            height=2.2,
+            height=2.4,
             aspect=scipy.constants.golden,
         )
         # TODO calculate this
         has_negative_z = metadata.get("has_negative_z", False)
         # grid.set_xticklabels(rotation=30, ha="right")
         for key, ax in grid.axes_dict.items():
-            if key == "z-Adjusted Metric":
+            if key.startswith("z-Adjusted Metric"):
                 if has_negative_z:
                     ax.set_yscale("symlog")
                 else:
                     ax.set_yscale("log")
-            elif key == "Adjusted Index":
+            elif key.startswith("Adjusted Index"):
                 ax.set_ylim([0, 1])
             else:  # base metric
                 if "base_ylim" in metadata:

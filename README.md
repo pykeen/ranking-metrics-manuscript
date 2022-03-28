@@ -1,16 +1,17 @@
 # Ranking Metrics Manuscript Supplement
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6347429.svg)](https://doi.org/10.5281/zenodo.6347429)
+[![arXiv](https://img.shields.io/badge/arXiv-2203.07544-b31b1b)](https://arxiv.org/abs/2203.07544)
+[![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6347429.svg)](https://doi.org/10.5281/zenodo.6347429)
 
-This repository contains analysis and supplementary information for _A Unified
-Framework for Rank-based Evaluation Metrics for Link Prediction_, non-archivally
-submitted to [GLB 2022](https://graph-learning-benchmarks.github.io/glb2022).
+This repository contains analysis and supplementary information
+for [A Unified Framework for Rank-based Evaluation Metrics for Link Prediction](https://arxiv.org/abs/2203.07544),
+non-archivally submitted to [GLB 2022](https://graph-learning-benchmarks.github.io/glb2022).
 
 📣 **Main Results** 📣 There's a dataset size-correlation for common rank-based
 evaluation metrics like mean rank (MR), mean reciprocal rank (MRR), and hits at
-k (H@K) that makes them impossible to compare across datasets. We used the
-expectation and variance of each metric to define adjusted metrics that don't
-have a dataset size-correlation and more easily comparable across datasets.
+k (H@K) that makes them difficult to compare across datasets. We used the
+expectation, maximum, and variance of each metric to define adjusted metrics that don't
+have a dataset size-correlation and are more easily comparable across datasets.
 
 ![Results](charts/mean_reciprocal_rank_plot.svg)
 
@@ -33,21 +34,27 @@ After installing `tox` with `pip install tox`, do the following:
 ### 📖 Citation
 
 ```bibtex
-@article{hoyt2022,
-   author = {Hoyt, Charles Tapley and Berrendorf, Max and Gaklin, Mikhail and Tresp, Volker and Gyori, Benjamin M},
-   title = {{A Unified Framework for Rank-based Evaluation Metrics for Link Prediction}},
-   year = {2022}
+@article{hoyt2022metrics,
+    archivePrefix = {arXiv},
+    arxivId = {2203.07544},
+    author = {Hoyt, Charles Tapley and Berrendorf, Max and Gaklin, Mikhail and Tresp, Volker and Gyori, Benjamin M.},
+    eprint = {2203.07544},
+    month = {mar},
+    title = {{A Unified Framework for Rank-based Evaluation Metrics for Link Prediction in Knowledge Graphs}},
+    url = {http://arxiv.org/abs/2203.07544},
+    year = {2022}
 }
 ```
 
 ### ⚖️ License
 
-The code in this package is licensed under the MIT License. The model, data,
-and results are licensed under the CC Zero license.
+The code in this package is licensed under the MIT License. The model, data, and
+results are licensed under the CC Zero license.
 
 ### 🎁 Support
 
-This project has been supported by several organizations (in alphabetical order):
+This project has been supported by several organizations (in alphabetical
+order):
 
 - [Harvard Program in Therapeutic Science - Laboratory of Systems Pharmacology](https://hits.harvard.edu/the-program/laboratory-of-systems-pharmacology/)
 - [Ludwig-Maximilians-Universität München](https://www.en.uni-muenchen.de/index.html)
