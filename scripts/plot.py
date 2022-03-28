@@ -52,15 +52,17 @@ METRICS = {
         ],
         "short": ["MRR", "AMRR", "ZMRR"],
     },
-    # "arithmetic_mean_rank": {
-    #     "base_title": "Mean Rank",
-    #     "base_yscale": "log",
-    #     "metrics": [
-    #         "arithmetic_mean_rank",
-    #         "adjusted_arithmetic_mean_rank_index",
-    #         "z_arithmetic_mean_rank",
-    #     ],
-    # },
+    "arithmetic_mean_rank": {
+        "base_title": "Mean Rank",
+        "base_yscale": "log",
+        "metrics": [
+            "arithmetic_mean_rank",
+            "adjusted_arithmetic_mean_rank_index",
+            "z_arithmetic_mean_rank",
+        ],
+        "short": ["MR", "AMRI", "ZMR"],
+        "has_negative_z": True,
+    },
     "hits_at_10": {
         "base_title": "Hits at 10",
         "base_ylim": [0, 1],
@@ -103,10 +105,15 @@ def main():
             height=2.4,
             aspect=scipy.constants.golden,
         )
+        # TODO calculate this
+        has_negative_z = metadata.get("has_negative_z", False)
         # grid.set_xticklabels(rotation=30, ha="right")
         for key, ax in grid.axes_dict.items():
             if key.startswith("z-Adjusted Metric"):
-                ax.set_yscale("log")
+                if has_negative_z:
+                    ax.set_yscale("symlog")
+                else:
+                    ax.set_yscale("log")
             elif key.startswith("Adjusted Index"):
                 ax.set_ylim([0, 1])
             else:  # base metric
@@ -123,6 +130,7 @@ def main():
         grid.savefig(chart_path_stub.with_suffix(".pdf"))
         grid.savefig(chart_path_stub.with_suffix(".svg"))
         grid.savefig(chart_path_stub.with_suffix(".png"), dpi=300)
+        plt.close(grid.fig)
 
 
 def _plot_summary(melted_df: pd.DataFrame):
