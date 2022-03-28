@@ -9,9 +9,9 @@ non-archivally submitted to [GLB 2022](https://graph-learning-benchmarks.github.
 
 📣 **Main Results** 📣 There's a dataset size-correlation for common rank-based
 evaluation metrics like mean rank (MR), mean reciprocal rank (MRR), and hits at
-k (H@K) that makes them impossible to compare across datasets. We used the
-expectation and variance of each metric to define adjusted metrics that don't
-have a dataset size-correlation and more easily comparable across datasets.
+k (H@K) that makes them difficult to compare across datasets. We used the
+expectation, maximum, and variance of each metric to define adjusted metrics that don't
+have a dataset size-correlation and are more easily comparable across datasets.
 
 ![Results](charts/mean_reciprocal_rank_plot.svg)
 
