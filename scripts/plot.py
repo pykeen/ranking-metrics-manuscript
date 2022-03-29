@@ -73,6 +73,17 @@ METRICS = {
         ],
         "short": ["$H_{10}$", "$AH_{10}$", "$ZH_{10}$"],
     },
+    "geometric_mean_rank": {
+        "base_title": "Geometric Mean Rank",
+        "base_yscale": "log",
+        "metrics": [
+            "geometric_mean_rank",
+            "adjusted_geometric_mean_rank_index",
+            "z_geometric_mean_rank",
+        ],
+        "short": ["GMR", "AGMRI", "ZGMR"],
+        "has_negative_z": True,
+    }
 }
 
 
@@ -115,7 +126,7 @@ def main():
                 else:
                     ax.set_yscale("log")
             elif key.startswith("Adjusted Index"):
-                ax.set_ylim([0, 1])
+                ax.set_ylim([-0.1, 1])
             else:  # base metric
                 if "base_ylim" in metadata:
                     ax.set_ylim(metadata["base_ylim"])

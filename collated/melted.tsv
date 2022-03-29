@@ -1,6 +1,7 @@
 dataset	dataset_triples	model	variable	value
 fb15k237	310079	complex	adjusted_arithmetic_mean_rank	0.0658277590554331
 fb15k237	310079	complex	adjusted_arithmetic_mean_rank_index	0.9343031751454628
+fb15k237	310079	complex	adjusted_geometric_mean_rank_index	0.9950961984274764
 fb15k237	310079	complex	adjusted_hits_at_1	0.1834488165480708
 fb15k237	310079	complex	adjusted_hits_at_10	0.4277218143462268
 fb15k237	310079	complex	adjusted_hits_at_3	0.2912684915809777
@@ -22,7 +23,8 @@ fb15k237	310079	complex	median_absolute_deviation	26.686839933100835
 fb15k237	310079	complex	median_rank	19.0
 fb15k237	310079	complex	standard_deviation	1432.294189453125
 fb15k237	310079	complex	variance	2051466.75
-fb15k237	310079	complex	z_arithmetic_mean_rank	-326.75545173657144
+fb15k237	310079	complex	z_arithmetic_mean_rank	-326.7554517365714
+fb15k237	310079	complex	z_geometric_mean_rank	201.53403072662027
 fb15k237	310079	complex	z_hits_at_1	4423.482268082471
 fb15k237	310079	complex	z_hits_at_10	3260.4223645655466
 fb15k237	310079	complex	z_hits_at_3	4054.635664140097
@@ -30,6 +32,7 @@ fb15k237	310079	complex	z_hits_at_5	3772.9612567954546
 fb15k237	310079	complex	z_inverse_harmonic_mean_rank	4973.062589037444
 fb15k237	310079	rotate	adjusted_arithmetic_mean_rank	0.0797019553572839
 fb15k237	310079	rotate	adjusted_arithmetic_mean_rank_index	0.920427034227056
+fb15k237	310079	rotate	adjusted_geometric_mean_rank_index	0.9889679456995643
 fb15k237	310079	rotate	adjusted_hits_at_1	0.079908903188713
 fb15k237	310079	rotate	adjusted_hits_at_10	0.2783605373666893
 fb15k237	310079	rotate	adjusted_hits_at_3	0.1541664807512656
@@ -51,7 +54,8 @@ fb15k237	310079	rotate	median_absolute_deviation	83.0257242363137
 fb15k237	310079	rotate	median_rank	58.0
 fb15k237	310079	rotate	standard_deviation	1432.3974609375
 fb15k237	310079	rotate	variance	2051762.5
-fb15k237	310079	rotate	z_arithmetic_mean_rank	-321.9021607877839
+fb15k237	310079	rotate	z_arithmetic_mean_rank	-321.9021607877838
+fb15k237	310079	rotate	z_geometric_mean_rank	200.2928929597197
 fb15k237	310079	rotate	z_hits_at_1	1926.8350190642611
 fb15k237	310079	rotate	z_hits_at_10	2121.876496545495
 fb15k237	310079	rotate	z_hits_at_3	2146.0916670590846
@@ -59,6 +63,7 @@ fb15k237	310079	rotate	z_hits_at_5	2187.902120499388
 fb15k237	310079	rotate	z_inverse_harmonic_mean_rank	2723.0436587764557
 fb15k237	310079	transe	adjusted_arithmetic_mean_rank	0.0307024992933074
 fb15k237	310079	transe	adjusted_arithmetic_mean_rank_index	0.9694333580872944
+fb15k237	310079	transe	adjusted_geometric_mean_rank_index	0.9969433655503132
 fb15k237	310079	transe	adjusted_hits_at_1	0.2269248151396536
 fb15k237	310079	transe	adjusted_hits_at_10	0.4854000914424062
 fb15k237	310079	transe	adjusted_hits_at_3	0.3465203817208118
@@ -80,7 +85,8 @@ fb15k237	310079	transe	median_absolute_deviation	16.30862440356162
 fb15k237	310079	transe	median_rank	12.0
 fb15k237	310079	transe	standard_deviation	672.4007568359375
 fb15k237	310079	transe	variance	452122.8125
-fb15k237	310079	transe	z_arithmetic_mean_rank	-339.0425133845743
+fb15k237	310079	transe	z_arithmetic_mean_rank	-339.04251338457425
+fb15k237	310079	transe	z_geometric_mean_rank	201.90813228210732
 fb15k237	310079	transe	z_hits_at_1	5471.81453686918
 fb15k237	310079	transe	z_hits_at_10	3700.0902985198563
 fb15k237	310079	transe	z_hits_at_3	4823.77582930321
@@ -88,6 +94,7 @@ fb15k237	310079	transe	z_hits_at_5	4362.971616169186
 fb15k237	310079	transe	z_inverse_harmonic_mean_rank	5897.853072557179
 fb15k237	310079	tucker	adjusted_arithmetic_mean_rank	0.0211472043713871
 fb15k237	310079	tucker	adjusted_arithmetic_mean_rank_index	0.9789899922856884
+fb15k237	310079	tucker	adjusted_geometric_mean_rank_index	0.9977736778803236
 fb15k237	310079	tucker	adjusted_hits_at_1	0.2561860950020808
 fb15k237	310079	tucker	adjusted_hits_at_10	0.5274836900537528
 fb15k237	310079	tucker	adjusted_hits_at_3	0.38141373660983
@@ -109,7 +116,8 @@ fb15k237	310079	tucker	median_absolute_deviation	10.378215529539212
 fb15k237	310079	tucker	median_rank	8.0
 fb15k237	310079	tucker	standard_deviation	503.1662902832031
 fb15k237	310079	tucker	variance	253176.328125
-fb15k237	310079	tucker	z_arithmetic_mean_rank	-342.38502240986213
+fb15k237	310079	tucker	z_arithmetic_mean_rank	-342.3850224098621
+fb15k237	310079	tucker	z_geometric_mean_rank	202.07629310001965
 fb15k237	310079	tucker	z_hits_at_1	6177.388759417805
 fb15k237	310079	tucker	z_hits_at_10	4020.8836679882174
 fb15k237	310079	tucker	z_hits_at_3	5309.51270951694
@@ -117,6 +125,7 @@ fb15k237	310079	tucker	z_hits_at_5	4773.287407236338
 fb15k237	310079	tucker	z_inverse_harmonic_mean_rank	6529.186020316809
 kinships	10686	complex	adjusted_arithmetic_mean_rank	0.0833556951010691
 kinships	10686	complex	adjusted_arithmetic_mean_rank_index	0.936264663248066
+kinships	10686	complex	adjusted_geometric_mean_rank_index	0.9694743441494681
 kinships	10686	complex	adjusted_hits_at_1	0.5219219111126383
 kinships	10686	complex	adjusted_hits_at_10	0.9119680853500252
 kinships	10686	complex	adjusted_hits_at_3	0.7359977198795576
@@ -139,6 +148,7 @@ kinships	10686	complex	median_rank	1.0
 kinships	10686	complex	standard_deviation	7.74437141418457
 kinships	10686	complex	variance	59.97528839111328
 kinships	10686	complex	z_arithmetic_mean_rank	-74.1764465831883
+kinships	10686	complex	z_geometric_mean_rank	47.4874374774938
 kinships	10686	complex	z_hits_at_1	232.13033587783207
 kinships	10686	complex	z_hits_at_10	121.85926051602151
 kinships	10686	complex	z_hits_at_3	186.9321039294467
@@ -146,6 +156,7 @@ kinships	10686	complex	z_hits_at_5	161.64419410895752
 kinships	10686	complex	z_inverse_harmonic_mean_rank	233.369999351929
 kinships	10686	rotate	adjusted_arithmetic_mean_rank	0.0500192707242474
 kinships	10686	rotate	adjusted_arithmetic_mean_rank_index	0.9703146387688334
+kinships	10686	rotate	adjusted_geometric_mean_rank_index	0.9842506598567372
 kinships	10686	rotate	adjusted_hits_at_1	0.6405003347343067
 kinships	10686	rotate	adjusted_hits_at_10	0.9708296614177598
 kinships	10686	rotate	adjusted_hits_at_3	0.8701628130555201
@@ -168,6 +179,7 @@ kinships	10686	rotate	median_rank	1.0
 kinships	10686	rotate	standard_deviation	5.056363582611084
 kinships	10686	rotate	variance	25.56681060791016
 kinships	10686	rotate	z_arithmetic_mean_rank	-76.90528059835599
+kinships	10686	rotate	z_geometric_mean_rank	48.21122080660526
 kinships	10686	rotate	z_hits_at_1	284.8810553133825
 kinships	10686	rotate	z_hits_at_10	129.73554739960667
 kinships	10686	rotate	z_hits_at_3	221.02441573005493
@@ -175,6 +187,7 @@ kinships	10686	rotate	z_hits_at_5	180.02319736218908
 kinships	10686	rotate	z_inverse_harmonic_mean_rank	274.4082740421561
 kinships	10686	transe	adjusted_arithmetic_mean_rank	0.0988580559521506
 kinships	10686	transe	adjusted_arithmetic_mean_rank_index	0.9204304813476089
+kinships	10686	transe	adjusted_geometric_mean_rank_index	0.946052197718626
 kinships	10686	transe	adjusted_hits_at_1	0.0998391889355087
 kinships	10686	transe	adjusted_hits_at_10	0.9156143776728052
 kinships	10686	transe	adjusted_hits_at_3	0.7230140011851096
@@ -197,6 +210,7 @@ kinships	10686	transe	median_rank	2.0
 kinships	10686	transe	standard_deviation	8.771553993225098
 kinships	10686	transe	variance	76.9401626586914
 kinships	10686	transe	z_arithmetic_mean_rank	-72.90746316950077
+kinships	10686	transe	z_geometric_mean_rank	46.34015831437256
 kinships	10686	transe	z_hits_at_1	44.362894077479865
 kinships	10686	transe	z_hits_at_10	122.34717209288075
 kinships	10686	transe	z_hits_at_3	183.6328479487427
@@ -204,6 +218,7 @@ kinships	10686	transe	z_hits_at_5	161.54847013368027
 kinships	10686	transe	z_inverse_harmonic_mean_rank	147.48264424195105
 kinships	10686	tucker	adjusted_arithmetic_mean_rank	0.0372485987380548
 kinships	10686	tucker	adjusted_arithmetic_mean_rank_index	0.9833586612350206
+kinships	10686	tucker	adjusted_geometric_mean_rank_index	0.9916888653122437
 kinships	10686	tucker	adjusted_hits_at_1	0.7849589698607043
 kinships	10686	tucker	adjusted_hits_at_10	0.983852133999117
 kinships	10686	tucker	adjusted_hits_at_3	0.9293108648857832
@@ -226,6 +241,7 @@ kinships	10686	tucker	median_rank	1.0
 kinships	10686	tucker	standard_deviation	3.5661890506744385
 kinships	10686	tucker	variance	12.71770477294922
 kinships	10686	tucker	z_arithmetic_mean_rank	-77.95065498279962
+kinships	10686	tucker	z_geometric_mean_rank	48.57556393610086
 kinships	10686	tucker	z_hits_at_1	349.1448285939935
 kinships	10686	tucker	z_hits_at_10	131.4780887455326
 kinships	10686	tucker	z_hits_at_3	236.054359642151
@@ -233,6 +249,7 @@ kinships	10686	tucker	z_hits_at_5	187.20249550798275
 kinships	10686	tucker	z_inverse_harmonic_mean_rank	310.9070729277915
 nations	1992	complex	adjusted_arithmetic_mean_rank	0.9372222180216402
 nations	1992	complex	adjusted_arithmetic_mean_rank_index	0.0808297617975174
+nations	1992	complex	adjusted_geometric_mean_rank_index	-0.05914924828977134
 nations	1992	complex	adjusted_hits_at_1	0.0741149086756445
 nations	1992	complex	adjusted_hits_at_10	0.3437756081571514
 nations	1992	complex	adjusted_hits_at_3	0.0602216366180569
@@ -255,6 +272,7 @@ nations	1992	complex	median_rank	4.0
 nations	1992	complex	standard_deviation	3.036050081253052
 nations	1992	complex	variance	9.217599868774414
 nations	1992	complex	z_arithmetic_mean_rank	1.9706985789064158
+nations	1992	complex	z_geometric_mean_rank	-1.3227367667435108
 nations	1992	complex	z_hits_at_1	-0.18059782163416122
 nations	1992	complex	z_hits_at_10	-0.2534007583250499
 nations	1992	complex	z_hits_at_3	-1.4478924457415714
@@ -262,6 +280,7 @@ nations	1992	complex	z_hits_at_5	-1.199874955329413
 nations	1992	complex	z_inverse_harmonic_mean_rank	-0.7145491959162119
 nations	1992	rotate	adjusted_arithmetic_mean_rank	0.7516666519350478
 nations	1992	rotate	adjusted_arithmetic_mean_rank_index	0.3197425066305995
+nations	1992	rotate	adjusted_geometric_mean_rank_index	0.24151263884252336
 nations	1992	rotate	adjusted_hits_at_1	0.1696901439091263
 nations	1992	rotate	adjusted_hits_at_10	0.5781414623867405
 nations	1992	rotate	adjusted_hits_at_3	0.3440160928868615
@@ -284,6 +303,7 @@ nations	1992	rotate	median_rank	3.0
 nations	1992	rotate	standard_deviation	2.578733444213867
 nations	1992	rotate	variance	6.649866104125977
 nations	1992	rotate	z_arithmetic_mean_rank	-5.5089969910459855
+nations	1992	rotate	z_geometric_mean_rank	5.400874166062669
 nations	1992	rotate	z_hits_at_1	4.377589451160422
 nations	1992	rotate	z_hits_at_10	1.2670037916252765
 nations	1992	rotate	z_hits_at_3	5.7306280109394265
@@ -291,6 +311,7 @@ nations	1992	rotate	z_hits_at_5	4.094118786972511
 nations	1992	rotate	z_inverse_harmonic_mean_rank	5.466301712559418
 nations	1992	transe	adjusted_arithmetic_mean_rank	0.788888891255414
 nations	1992	transe	adjusted_arithmetic_mean_rank_index	0.2718168768453277
+nations	1992	transe	adjusted_geometric_mean_rank_index	0.058125843743220065
 nations	1992	transe	adjusted_hits_at_1	-0.1170355617913192
 nations	1992	transe	adjusted_hits_at_10	0.5312682915408218
 nations	1992	transe	adjusted_hits_at_3	0.3672779335646324
@@ -313,6 +334,7 @@ nations	1992	transe	median_rank	2.0
 nations	1992	transe	standard_deviation	2.48181414604187
 nations	1992	transe	variance	6.159401893615723
 nations	1992	transe	z_arithmetic_mean_rank	-4.008578413365996
+nations	1992	transe	z_geometric_mean_rank	1.2998506801047742
 nations	1992	transe	z_hits_at_1	-9.296972367223336
 nations	1992	transe	z_hits_at_10	0.9629228816352058
 nations	1992	transe	z_hits_at_3	6.31903132706082
@@ -320,6 +342,7 @@ nations	1992	transe	z_hits_at_5	3.9583753576827156
 nations	1992	transe	z_inverse_harmonic_mean_rank	-2.826379823833295
 nations	1992	tucker	adjusted_arithmetic_mean_rank	0.4399999978701274
 nations	1992	tucker	adjusted_arithmetic_mean_rank_index	0.7210300420357323
+nations	1992	tucker	adjusted_geometric_mean_rank_index	0.7366154931554603
 nations	1992	tucker	adjusted_hits_at_1	0.5400441804388685
 nations	1992	tucker	adjusted_hits_at_10	0.8125073166163296
 nations	1992	tucker	adjusted_hits_at_3	0.7813386976289539
@@ -342,6 +365,7 @@ nations	1992	tucker	median_rank	1.0
 nations	1992	tucker	standard_deviation	1.859252691268921
 nations	1992	tucker	variance	3.4568207263946533
 nations	1992	tucker	z_arithmetic_mean_rank	-18.072197011806324
+nations	1992	tucker	z_geometric_mean_rank	16.47270969491127
 nations	1992	tucker	z_hits_at_1	22.040565133239447
 nations	1992	tucker	z_hits_at_10	2.787408341575603
 nations	1992	tucker	z_hits_at_3	16.792610354021626
@@ -349,6 +373,7 @@ nations	1992	tucker	z_hits_at_5	10.881290251462154
 nations	1992	tucker	z_inverse_harmonic_mean_rank	24.038475946274495
 wn18rr	92583	complex	adjusted_arithmetic_mean_rank	0.3219344393227256
 wn18rr	92583	complex	adjusted_arithmetic_mean_rank_index	0.6780990098017802
+wn18rr	92583	complex	adjusted_geometric_mean_rank_index	0.9954822860413581
 wn18rr	92583	complex	adjusted_hits_at_1	0.4327835474772161
 wn18rr	92583	complex	adjusted_hits_at_10	0.4908114834118824
 wn18rr	92583	complex	adjusted_hits_at_3	0.460459393415456
@@ -371,6 +396,7 @@ wn18rr	92583	complex	median_rank	15.0
 wn18rr	92583	complex	standard_deviation	11354.513671875
 wn18rr	92583	complex	variance	128924976.0
 wn18rr	92583	complex	z_arithmetic_mean_rank	-89.8134022013541
+wn18rr	92583	complex	z_geometric_mean_rank	76.1927258227572
 wn18rr	92583	complex	z_hits_at_1	6663.878237377021
 wn18rr	92583	complex	z_hits_at_10	2389.586814789419
 wn18rr	92583	complex	z_hits_at_3	4093.3257473653307
@@ -378,6 +404,7 @@ wn18rr	92583	complex	z_hits_at_5	3266.9778057615667
 wn18rr	92583	complex	z_inverse_harmonic_mean_rank	5437.187858916565
 wn18rr	92583	rotate	adjusted_arithmetic_mean_rank	0.1052194604869481
 wn18rr	92583	rotate	adjusted_arithmetic_mean_rank_index	0.8948246792355319
+wn18rr	92583	rotate	adjusted_geometric_mean_rank_index	0.998988312087934
 wn18rr	92583	rotate	adjusted_hits_at_1	0.3953339233884342
 wn18rr	92583	rotate	adjusted_hits_at_10	0.5891599540326979
 wn18rr	92583	rotate	adjusted_hits_at_3	0.4939776054251456
@@ -400,6 +427,7 @@ wn18rr	92583	rotate	median_rank	4.0
 wn18rr	92583	rotate	standard_deviation	6645.44091796875
 wn18rr	92583	rotate	variance	44161888.0
 wn18rr	92583	rotate	z_arithmetic_mean_rank	-118.51950366456887
+wn18rr	92583	rotate	z_geometric_mean_rank	76.46107181448397
 wn18rr	92583	rotate	z_hits_at_1	6087.2395532848695
 wn18rr	92583	rotate	z_hits_at_10	2868.410598475551
 wn18rr	92583	rotate	z_hits_at_3	4391.2911330882125
@@ -407,6 +435,7 @@ wn18rr	92583	rotate	z_hits_at_5	3687.3793460186166
 wn18rr	92583	rotate	z_inverse_harmonic_mean_rank	5543.141761375476
 wn18rr	92583	transe	adjusted_arithmetic_mean_rank	0.0494486692335743
 wn18rr	92583	transe	adjusted_arithmetic_mean_rank_index	0.9505982216744084
+wn18rr	92583	transe	adjusted_geometric_mean_rank_index	0.9988569254339359
 wn18rr	92583	transe	adjusted_hits_at_1	0.0711125203184316
 wn18rr	92583	transe	adjusted_hits_at_10	0.5696613007270058
 wn18rr	92583	transe	adjusted_hits_at_3	0.3881216195374015
@@ -429,6 +458,7 @@ wn18rr	92583	transe	median_rank	6.0
 wn18rr	92583	transe	standard_deviation	4175.888671875
 wn18rr	92583	transe	variance	17438048.0
 wn18rr	92583	transe	z_arithmetic_mean_rank	-125.90691177546044
+wn18rr	92583	transe	z_geometric_mean_rank	76.45101567642384
 wn18rr	92583	transe	z_hits_at_1	1094.9703978569316
 wn18rr	92583	transe	z_hits_at_10	2773.478578753431
 wn18rr	92583	transe	z_hits_at_3	3450.2677975654397
@@ -436,6 +466,7 @@ wn18rr	92583	transe	z_hits_at_5	3299.9504755856497
 wn18rr	92583	transe	z_inverse_harmonic_mean_rank	3042.780219066568
 wn18rr	92583	tucker	adjusted_arithmetic_mean_rank	0.110048513687257
 wn18rr	92583	tucker	adjusted_arithmetic_mean_rank_index	0.8899953878169575
+wn18rr	92583	tucker	adjusted_geometric_mean_rank_index	0.9985335508732592
 wn18rr	92583	tucker	adjusted_hits_at_1	0.4120922026610398
 wn18rr	92583	tucker	adjusted_hits_at_10	0.5426368514085905
 wn18rr	92583	tucker	adjusted_hits_at_3	0.4855980524227232
@@ -458,6 +489,7 @@ wn18rr	92583	tucker	median_rank	5.0
 wn18rr	92583	tucker	standard_deviation	6400.65869140625
 wn18rr	92583	tucker	variance	40968432.0
 wn18rr	92583	tucker	z_arithmetic_mean_rank	-117.87984648958248
+wn18rr	92583	tucker	z_geometric_mean_rank	76.42626507102867
 wn18rr	92583	tucker	z_hits_at_1	6345.2787817827275
 wn18rr	92583	tucker	z_hits_at_10	2641.9061303666335
 wn18rr	92583	tucker	z_hits_at_3	4316.799786657492
