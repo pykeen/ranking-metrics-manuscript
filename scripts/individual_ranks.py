@@ -139,6 +139,7 @@ def add_lines(model, dataset, *, metrics, palette, labels, color):
 
 @click.command()
 @click.option("-r", "--model-root", type=pathlib.Path, default=ROOT.joinpath("models"))
+@click.option("-b", "--buffer-root", type=pathlib.Path, default=None)
 @click.option(
     "-d",
     "--dataset",
@@ -156,6 +157,7 @@ def add_lines(model, dataset, *, metrics, palette, labels, color):
 @more_click.log_level_option()
 def main(
     model_root: pathlib.Path,
+    buffer_root: Optional[pathlib.Path],
     dataset: Collection[str],
     model: Collection[str],
     log_level: str,
@@ -163,7 +165,7 @@ def main(
     """Plot distribution of individual ranks, and different mean ranks."""
     logging.basicConfig(level=log_level)
 
-    df, metrics = load_data(datasets=dataset, models=model, model_root=model_root)
+    df, metrics = load_data(datasets=dataset, models=model, model_root=model_root, buffer_root=buffer_root)
 
     palette = seaborn.color_palette(n_colors=4)
     grid = seaborn.displot(
