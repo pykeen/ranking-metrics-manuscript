@@ -126,7 +126,7 @@ DATASETS = ("fb15k237", "kinships", "nations", "wn18rr")
 MODELS = ("complex", "rotate", "transe", "tucker")
 
 
-def add_lines(model, dataset, *, metrics, palette, labels, color):
+def add_lines(model, dataset, *, metrics, palette, labels, color, log: bool = False):
     assert model.nunique() == 1
     assert dataset.nunique() == 1
     model = model.unique().item()
@@ -134,7 +134,10 @@ def add_lines(model, dataset, *, metrics, palette, labels, color):
     d = metrics.get((dataset, model), {})
     keys = sorted(d.keys())
     for i, key in enumerate(keys, start=1):
-        plt.axvline(d[key], color=palette[i], label=labels[key])
+        v = d[key]
+        if log:
+            v = numpy.log(v)
+        plt.axvline(v, color=palette[i], label=labels[key])
 
 
 @click.command()
@@ -166,18 +169,22 @@ def main(
     logging.basicConfig(level=log_level)
 
     df, metrics = load_data(datasets=dataset, models=model, model_root=model_root, buffer_root=buffer_root)
+    df["rank [log]"] = df["rank"].apply(numpy.log)
 
     palette = seaborn.color_palette(n_colors=4)
     grid = seaborn.displot(
         data=df,
-        x="rank",
+        x="rank [log]",
+        # x="rank",
         col="model",
-        log_scale=True,
+        # log_scale=True,
         bins=10,
+        # cf. https://github.com/mwaskom/seaborn/issues/2557
+        # common_bins=False,
         row="dataset",
         facet_kws=dict(
-            sharex=False,
-            sharey=False,
+            # sharex="row",
+            sharey="row",
         ),
     )
     grid.map(
@@ -191,8 +198,18 @@ def main(
             "geometric_mean_rank": "GMR",
             "harmonic_mean_rank": "HMR",
         },
+        log=True,
     )
-    grid.set(xlabel="Rank")
+    grid.set(xlabel="Rank [log]", ylabel="Frequency", xlim=(0, None))
+    # grid.set(xlabel="Rank", ylabel="Frequency", xlim=(1, None))
+    # num_entities = {
+    #     dsn: get_dataset(dataset=dsn).num_entities
+    #     for dsn in dataset
+    # }
+    # for (dataset, model), ax in grid.axes_dict.items():
+    #     ax.set_xlim(1, num_entities[dataset])
+    for ax in grid.axes.flat:
+        ax.set_yscale("log")
     grid.tight_layout()
     grid.savefig("/tmp/plot.pdf")
 
