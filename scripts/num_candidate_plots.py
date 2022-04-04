@@ -23,8 +23,9 @@ CHART_STUB = CHARTS_DIRECTORY.joinpath("candidate_plot")
 
 
 @click.command()
+@force_option
 def main(
-    force: bool = True,
+    force: bool,
     num_samples: int = 1_000,
     min_log10: int = 0,
     max_log10: int = 6,
@@ -70,7 +71,7 @@ def main(
         hue="metric",
         kind="line",
         facet_kws={"sharey": False, "sharex": True},
-        height=3.5,
+        height=2.3,
         aspect=1.6,
     )
     g.set(xscale="log", yscale="log", ylabel="")
