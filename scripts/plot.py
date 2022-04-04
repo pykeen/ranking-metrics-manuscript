@@ -1,5 +1,6 @@
 """Generate plot."""
 
+import click
 import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.constants
@@ -84,7 +85,11 @@ METRICS = {
 }
 
 
-def main():
+@click.command()
+@click.option(
+    "--wrap", is_flag=True, help="Use 2x2 grid instead of 1x3 grid for embedding in slides."
+)
+def main(wrap: bool = False):
     melted_df = pd.read_csv(MELTED_PATH, sep="\t")
     melted_df.loc[:, "model"] = melted_df["model"].map(MODEL_TITLES)
     melted_df.loc[:, "dataset"] = melted_df["dataset"].map(DATASET_TITLES)
@@ -101,6 +106,7 @@ def main():
             y="value",
             col="variable",
             col_order=metric_order,
+            col_wrap=2 if wrap else None,
             # hue="model",
             hue="dataset",
             hue_order=DATASET_ORDER,
@@ -129,6 +135,8 @@ def main():
         grid.set_ylabels(label=metadata["base_title"])
         grid.set_xlabels(label="")
         grid.set_titles(col_template="{col_name}", size=13)
+        if wrap:
+            sns.move_legend(grid, "upper left", bbox_to_anchor=(0.425, 0.40), title="Dataset")
         grid.tight_layout()
         chart_path_stub = CHARTS_DIRECTORY.joinpath(f"{base_metric_key}_plot")
         grid.savefig(chart_path_stub.with_suffix(".pdf"))
