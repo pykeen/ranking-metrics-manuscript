@@ -30,6 +30,7 @@ def main(
     min_log10: int = 0,
     max_log10: int = 6,
     points: int = 40,
+    legend_bottom: bool = False
 ):
     sizes = np.logspace(min_log10, max_log10, num=points).astype(int)
 
@@ -77,14 +78,15 @@ def main(
         aspect=1.6,
     )
     grid.set(xscale="log", yscale="log", ylabel="Value", xlabel="Number of Candidates")
-    sns.move_legend(
-        grid,
-        "lower center",
-        bbox_to_anchor=(0.40, -0.175),
-        ncol=3,
-        title="Metric",
-        frameon=True,
-    )
+    if legend_bottom:
+        sns.move_legend(
+            grid,
+            "lower center",
+            bbox_to_anchor=(0.40, -0.175),
+            ncol=3,
+            title="Metric",
+            frameon=True,
+        )
     grid.tight_layout()
     grid.savefig(CHART_STUB.with_suffix(".png"), dpi=300)
     grid.savefig(CHART_STUB.with_suffix(".svg"))
