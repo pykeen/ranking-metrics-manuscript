@@ -2,11 +2,10 @@
 
 import numpy
 import pandas
+from constants import COLLATED_PATH, MELTED_PATH
 from pykeen.datasets import get_dataset
 from pykeen.evaluation.evaluator import get_candidate_set_size
 from pykeen.metrics import rank_based_metric_resolver
-
-from constants import COLLATED_PATH, MELTED_PATH
 
 df = pandas.read_csv(COLLATED_PATH, sep="\t")
 pairs = {}
@@ -59,10 +58,6 @@ id_vars = ["dataset", "dataset_triples", "model"]
 melted_df = pandas.melt(
     df,
     id_vars=id_vars,
-    value_vars=[
-        v
-        for v in df.columns
-        if v not in id_vars and v not in ("evaluation", "training")
-    ],
+    value_vars=[v for v in df.columns if v not in id_vars and v not in ("evaluation", "training")],
 ).sort_values(by=["dataset", "model", "variable"])
 melted_df.to_csv(MELTED_PATH, sep="\t", index=False)

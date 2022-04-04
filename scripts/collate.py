@@ -2,10 +2,9 @@ import json
 
 import click
 import pandas as pd
+from constants import COLLATED_PATH, MELTED_PATH, MODEL_DIRECTORY
 from docdata import get_docdata
 from pykeen.datasets import dataset_resolver
-
-from constants import COLLATED_PATH, MELTED_PATH, MODEL_DIRECTORY
 
 
 @click.command()
@@ -54,9 +53,7 @@ def collate():
         df,
         id_vars=id_vars,
         value_vars=[
-            v
-            for v in df.columns
-            if v not in id_vars and v not in ("evaluation", "training")
+            v for v in df.columns if v not in id_vars and v not in ("evaluation", "training")
         ],
     ).sort_values(by=["dataset", "model", "variable"])
     melted_df.to_csv(MELTED_PATH, sep="\t", index=False)

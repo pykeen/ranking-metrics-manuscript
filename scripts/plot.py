@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.constants
 import seaborn as sns
-
 from constants import CHARTS_DIRECTORY, MELTED_PATH
 from pykeen.datasets import dataset_resolver
 
@@ -12,7 +11,7 @@ SIGIL = r"\mathcal{T}_{train}"
 
 
 def _lookup_key(d):
-    return dataset_resolver.docdata(d, 'statistics', 'training')
+    return dataset_resolver.docdata(d, "statistics", "training")
 
 
 MODEL_TITLES = {
@@ -28,13 +27,11 @@ DATASET_TITLES = {
     "kinships": "Kinships",
 }
 DATASET_TITLES = {
-    key: f"{value} ($|{SIGIL}|={_lookup_key(key):,}$)"
-    for key, value in DATASET_TITLES.items()
+    key: f"{value} ($|{SIGIL}|={_lookup_key(key):,}$)" for key, value in DATASET_TITLES.items()
 }
 # show datasets in increasing order of entity size
 DATASET_ORDER = [
-    v
-    for _, v in sorted(DATASET_TITLES.items(), key=lambda pair: _lookup_key(pair[0]))
+    v for _, v in sorted(DATASET_TITLES.items(), key=lambda pair: _lookup_key(pair[0]))
 ]
 ORDER = [
     "Original",
@@ -83,7 +80,7 @@ METRICS = {
         ],
         "short": ["GMR", "AGMRI", "ZGMR"],
         "has_negative_z": True,
-    }
+    },
 }
 
 
@@ -96,10 +93,7 @@ def main():
     for base_metric_key, metadata in METRICS.items():
         metrics = metadata["metrics"]
         df = melted_df[melted_df["variable"].isin(metrics)].copy()
-        metric_order = [
-            f"{order} ({short})"
-            for order, short in zip(ORDER, metadata["short"])
-        ]
+        metric_order = [f"{order} ({short})" for order, short in zip(ORDER, metadata["short"])]
         df.loc[:, "variable"] = df["variable"].map(dict(zip(metrics, metric_order)))
         grid: sns.FacetGrid = sns.catplot(
             data=df,
@@ -136,7 +130,6 @@ def main():
         grid.set_xlabels(label="")
         grid.set_titles(col_template="{col_name}", size=13)
         grid.tight_layout()
-
         chart_path_stub = CHARTS_DIRECTORY.joinpath(f"{base_metric_key}_plot")
         grid.savefig(chart_path_stub.with_suffix(".pdf"))
         grid.savefig(chart_path_stub.with_suffix(".svg"))
