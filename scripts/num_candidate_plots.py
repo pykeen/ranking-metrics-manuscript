@@ -59,11 +59,13 @@ def main(
         )
         df.to_csv(CANDIDATE_PATH, sep="\t", index=False)
 
-    g = sns.relplot(
-        data=df.melt(
-            id_vars=["metric", "candidate", "inverted"],
-            value_vars=["expectation", "variance"],
-        ),
+    data = df.melt(
+        id_vars=["metric", "candidate", "inverted"],
+        value_vars=["expectation", "variance"],
+    )
+    data["metric"] = data["metric"].map(lambda s: s.replace("_", " ").title())
+    grid: sns.FacetGrid = sns.relplot(
+        data=data,
         x="candidate",
         y="value",
         col="variable",
@@ -74,11 +76,19 @@ def main(
         height=2.3,
         aspect=1.6,
     )
-    g.set(xscale="log", yscale="log", ylabel="")
-    g.tight_layout()
-    g.savefig(CHART_STUB.with_suffix(".png"), dpi=300)
-    g.savefig(CHART_STUB.with_suffix(".svg"))
-    g.savefig(CHART_STUB.with_suffix(".pdf"))
+    grid.set(xscale="log", yscale="log", ylabel="Value", xlabel="Number of Candidates")
+    sns.move_legend(
+        grid,
+        "lower center",
+        bbox_to_anchor=(0.40, -0.175),
+        ncol=3,
+        title="Metric",
+        frameon=True,
+    )
+    grid.tight_layout()
+    grid.savefig(CHART_STUB.with_suffix(".png"), dpi=300)
+    grid.savefig(CHART_STUB.with_suffix(".svg"))
+    grid.savefig(CHART_STUB.with_suffix(".pdf"))
 
 
 def _get_df(
