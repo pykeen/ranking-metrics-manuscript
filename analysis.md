@@ -4,6 +4,10 @@ title: Analysis
 permalink: /analysis/
 ---
 
+## Summary of Data
+
+![](charts/summary.svg)
+
 ## Characterization of Metrics
 
 ![](charts/candidate_plot.svg)
@@ -16,3 +20,22 @@ GMR, HMR) and the lower plots show the respective reciprocal variants of the
 metrics (i.e., IMR, IGMR, MRR) as well as the Hits at K for all K up to half the
 order of magnitude of the number of entities. Closed form solutions were used
 when possible, otherwise 500 samples were used in a Monte-carlo simulation.
+
+## Other Plots
+
+### Arithmetic Mean Rank
+
+![](charts/arithmetic_mean_rank_plot.svg)
+
+### Geometric Mean Rank
+
+![](charts/geometric_mean_rank_plot.svg)
+
+### Geometric Mean Rank
+
+![](charts/mean_reciprocal_rank_plot.svg)
+
+### Hits at K
+
+![](charts/hits_at_10_plot.svg)
+

@@ -156,16 +156,18 @@ def _plot_summary(melted_df: pd.DataFrame):
                 "inverse_median_rank",
                 "standard_deviation",
                 "median_absolute_deviation",
-                "geometric_mean_rank",
                 "harmonic_mean_rank",
                 "inverse_geometric_mean_rank",
                 "inverse_arithmetic_mean_rank",
                 "hits_at_1",
                 "hits_at_3",
+                "hits_at_5",
                 "adjusted_hits_at_1",
                 "adjusted_hits_at_3",
+                "adjusted_hits_at_5",
                 "z_hits_at_1",
                 "z_hits_at_3",
+                "z_hits_at_5",
             }
         )
     ]
@@ -178,6 +180,8 @@ def _plot_summary(melted_df: pd.DataFrame):
         col_wrap=4,
         kind="line",
         facet_kws={"sharey": False, "sharex": True},
+        height=2.2,
+        aspect=scipy.constants.golden,
     ).set(xscale="log")
     summary_path_stub = CHARTS_DIRECTORY.joinpath("summary")
     plt.savefig(summary_path_stub.with_suffix(".png"), dpi=300)
