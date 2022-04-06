@@ -31,7 +31,7 @@ when possible, otherwise 500 samples were used in a Monte-carlo simulation.
 
 ![](charts/geometric_mean_rank_plot.svg)
 
-### Geometric Mean Rank
+### Inverse Harmonic Mean Rank (Mean Reciprocal Rank)
 
 ![](charts/mean_reciprocal_rank_plot.svg)
 
